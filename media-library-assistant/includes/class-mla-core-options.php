@@ -457,7 +457,21 @@ class MLACoreOptions {
 	 *
 	 * @var array See above documentation of array elements
 	 */
-	public static $mla_debug_option_definitions = array (
+	public static $mla_prelocalize_option_definitions = array (
+			self::MLA_MEDIA_GRID_TOOLBAR =>
+				array('tab' => 'general',
+					'name' => 'Enable Media Grid Enhancements',
+					'type' => 'checkbox',
+					'std' => 'checked',
+					'help' => 'Check/uncheck this option to enable/disable Media Library Grid View Enhancements.' ),
+
+			self::MLA_MEDIA_MODAL_TOOLBAR =>
+				array('tab' => 'general',
+					'name' => 'Enable Media Manager Enhancements',
+					'type' => 'checkbox',
+					'std' => 'checked',
+					'help' => 'Check/uncheck this option to enable/disable Media Manager Modal Window Enhancements.' ),
+
 			self::MLA_DEBUG_FILE =>
 				array('tab' => 'debug',
 					'name' => 'Debug File',
@@ -1651,6 +1665,7 @@ class MLACoreOptions {
 					'help' => __( 'Enter the text area...'),
 			*/
 		);
+		MLACore::mla_initialize_tax_checked_on_top();
 	}
 } // class MLACoreOptions
 ?>

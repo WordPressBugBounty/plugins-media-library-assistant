@@ -3,8 +3,8 @@ Contributors: dglingren
 Donate link: http://davidlingren.com/#donate
 Tags: categories, images, media, media library, tags
 Requires at least: 4.1
-Tested up to: 6.7.0
-Stable tag: 3.21
+Tested up to: 6.7.1
+Stable tag: 3.22
 Requires PHP: 5.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -187,6 +187,10 @@ All of the MLA source code has been annotated with "DocBlocks", a special type o
 
 == Changelog ==
 
+= 3.22 =
+* Fix: IMPORTANT: Resolve "Fatal error: Uncaught TypeError: array_key_exists():" in `class-mla-options.php`.
+* Fix: Delay localization of built-in style and markup templates until `init` action.
+
 = 3.21 =
 * New: For the Media/Assistant admin page, a new entry in the "Screen Options" pulldown menu lets you change the "List Taxonomy" that populates the dropdown at the top of the submenu table.
 * New: For the `[mla_gallery]` shortcode, Simple Custom Field Parameters now include `meta_value_delimiter` to change the delimiter between multiple custom field values.
@@ -360,8 +364,8 @@ All of the MLA source code has been annotated with "DocBlocks", a special type o
 
 == Upgrade Notice ==
 
-= 3.21 =
-IMPORTANT: WP 6.7 i18n fix and a Cross-Site Scripting (XSS) security risk mitigation. Media/Assistant admin page fixes and enhancement. Three enhancements, ten fixes in all.
+= 3.22 =
+IMPORTANT: Resolve "Fatal error: Uncaught TypeError: array_key_exists():" in `class-mla-options.php`. Delay localization of built-in style and markup templates until `init` action.
 
 == Acknowledgements ==
 

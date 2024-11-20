@@ -21,7 +21,7 @@ class MLACore {
 	 *
 	 * @var	string
 	 */
-	const CURRENT_MLA_VERSION = '3.21';
+	const CURRENT_MLA_VERSION = '3.22';
 
 	/**
 	 * Current date for Development Versions, empty for production versions
@@ -697,12 +697,12 @@ class MLACore {
 		// Do not process debug options unless MLA_DEBUG_LEVEL is set in wp-config.php
 		if ( MLA_DEBUG_LEVEL & 1 ) {
 			// Set up alternate MLA debug log file
-			$error_log_name = MLACore::mla_get_option( MLACoreOptions::MLA_DEBUG_FILE, false, false, MLACoreOptions::$mla_debug_option_definitions ); 
+			$error_log_name = MLACore::mla_get_option( MLACoreOptions::MLA_DEBUG_FILE, false, false, MLACoreOptions::$mla_prelocalize_option_definitions ); 
 			if ( ! empty( $error_log_name ) ) {
 				MLACore::mla_debug_file( $error_log_name );
 
 				// Override PHP error_log file
-				if ( 'checked' === MLACore::mla_get_option( MLACoreOptions::MLA_DEBUG_REPLACE_PHP_LOG, false, false, MLACoreOptions::$mla_debug_option_definitions ) ) {
+				if ( 'checked' === MLACore::mla_get_option( MLACoreOptions::MLA_DEBUG_REPLACE_PHP_LOG, false, false, MLACoreOptions::$mla_prelocalize_option_definitions ) ) {
 					$result = ini_set('error_log', WP_CONTENT_DIR . self::$mla_debug_file );
 				}
 			}
@@ -712,7 +712,7 @@ class MLACore {
 			 * Override MLA debug levels
 			 */
 			MLACore::$mla_debug_level = 0; // MLA_DEBUG_LEVEL;
-			$mla_reporting = trim( MLACore::mla_get_option( MLACoreOptions::MLA_DEBUG_REPLACE_LEVEL, false, false, MLACoreOptions::$mla_debug_option_definitions ) );
+			$mla_reporting = trim( MLACore::mla_get_option( MLACoreOptions::MLA_DEBUG_REPLACE_LEVEL, false, false, MLACoreOptions::$mla_prelocalize_option_definitions ) );
 			if ( strlen( $mla_reporting ) ) {
 				if ( ctype_digit( $mla_reporting ) ) {
 					$mla_reporting = (int) $mla_reporting; 
@@ -855,7 +855,7 @@ class MLACore {
 	 * @return	mixed	Value(s) for the option or false if the option is not a defined MLA option
 	 */
 	public static function mla_get_option( $option, $get_default = false, $get_stored = false, &$option_table = NULL ) {
-		if ( NULL == $option_table ) {
+		if ( NULL === $option_table ) {
 			if ( empty( MLACoreOptions::$mla_option_definitions ) ) {
 				MLACoreOptions::mla_localize_option_definitions_array();
 			}

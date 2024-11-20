@@ -76,7 +76,7 @@ For more information about the example plugins, jump to <a href="#mla_example_pl
 <li><a href="#mla_term_list_examples">MLA Term List Examples</a></li>
 <li><a href="#mla_term_list_hooks">MLA Term List Filters (Hooks)</a></li>
 </ul></div>
-<div  id="mla-doc-cf-list-shortcode" style="display:inline"><a href="#mla_cf_list"><strong>MLA Custom Field List Shortcode</strong></a>
+<div  id="mla-doc-cf-list-shortcode" style="display:inline-block"><a href="#mla_cf_list"><strong>MLA Custom Field List Shortcode</strong></a>
 <ul class="mla-doc-toc-list">
 <li><a href="#cf_list_output">Custom Field List Output Formats</a></li>
 <li><a href="#cf_list_items">Custom Field List Item Parameters</a></li>
