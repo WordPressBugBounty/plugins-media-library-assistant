@@ -67,7 +67,7 @@ class MLATemplate_Support {
 		self::$mla_template_definitions = array (
 			'style' => array(
 				'gallery' => array(
-					'label' => _x( 'Gallery', 'table_view_singular', 'media_library-assistant' ),
+					'label' => _x( 'Gallery', 'table_view_singular', 'media-library-assistant' ),
 					'default_names' => array( 'default' ),
 					'sections' => array(
 						'description' => array(
@@ -85,7 +85,7 @@ class MLATemplate_Support {
 					),
 				),
 				'tag-cloud' => array(
-					'label' => _x( 'Tag Cloud', 'table_view_singular', 'media_library-assistant' ),
+					'label' => _x( 'Tag Cloud', 'table_view_singular', 'media-library-assistant' ),
 					'default_names' => array( 'tag-cloud' ),
 					'sections' => array(
 						'description' => array(
@@ -103,7 +103,7 @@ class MLATemplate_Support {
 					),
 				),
 				'term-list' => array(
-					'label' => _x( 'Term List', 'table_view_singular', 'media_library-assistant' ),
+					'label' => _x( 'Term List', 'table_view_singular', 'media-library-assistant' ),
 					'default_names' => array( 'term-list' ),
 					'sections' => array(
 						'description' => array(
@@ -121,7 +121,7 @@ class MLATemplate_Support {
 					),
 				),
 				'custom-list' => array(
-					'label' => _x( 'Custom Field List', 'table_view_singular', 'media_library-assistant' ),
+					'label' => _x( 'Custom Field List', 'table_view_singular', 'media-library-assistant' ),
 					'default_names' => array( 'custom-list', 'custom-list-flat-div', 'custom-list-checklist-div' ),
 					'sections' => array(
 						'description' => array(
@@ -141,7 +141,7 @@ class MLATemplate_Support {
 			),
 			'markup' => array(
 				'gallery' => array(
-					'label' => _x( 'Gallery', 'table_view_singular', 'media_library-assistant' ),
+					'label' => _x( 'Gallery', 'table_view_singular', 'media-library-assistant' ),
 					'default_names' => array( 'default' ),
 					'sections' => array(
 						'description' => array(
@@ -189,7 +189,7 @@ class MLATemplate_Support {
 					),
 				),
 				'tag-cloud' => array(
-					'label' => _x( 'Tag Cloud', 'table_view_singular', 'media_library-assistant' ),
+					'label' => _x( 'Tag Cloud', 'table_view_singular', 'media-library-assistant' ),
 					'default_names' => array( 'tag-cloud', 'tag-cloud-ul', 'tag-cloud-dl' ),
 					'sections' => array(
 						'description' => array(
@@ -237,7 +237,7 @@ class MLATemplate_Support {
 					),
 				),
 				'term-list' => array(
-					'label' => _x( 'Term List', 'table_view_singular', 'media_library-assistant' ),
+					'label' => _x( 'Term List', 'table_view_singular', 'media-library-assistant' ),
 					'default_names' => array( 'term-list-ul', 'term-list-dl', 'term-list-dropdown', 'term-list-checklist' ),
 					'sections' => array(
 						'description' => array(
@@ -291,7 +291,7 @@ class MLATemplate_Support {
 					),
 				),
 				'custom-list' => array(
-					'label' => _x( 'Custom Field List', 'table_view_singular', 'media_library-assistant' ),
+					'label' => _x( 'Custom Field List', 'table_view_singular', 'media-library-assistant' ),
 					'default_names' => array( 'custom-list-flat-div', 'custom-list-grid', 'custom-list-ul', 'custom-list-dl', 'custom-list-dropdown', 'custom-list-checklist', 'custom-list-checklist-div' ),
 					'sections' => array(
 						'description' => array(
