@@ -540,6 +540,8 @@ class MLACoreOptions {
 	 * @return	void
 	 */
 	public static function mla_localize_option_definitions_array() {
+		// error_log( __LINE__ . ' DEBUG: MLACoreOptions::mla_localize_option_definitions_array', 0 );
+		
 		self::$mla_option_definitions = array (
 			// This option records the highest MLA version so-far installed
 			self::MLA_VERSION_OPTION =>

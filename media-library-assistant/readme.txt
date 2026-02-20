@@ -2,8 +2,8 @@
 Contributors: dglingren
 Donate link: http://davidlingren.com/#donate
 Tags: categories, images, media, media library, tags
-Tested up to: 6.9
-Stable tag: 3.32
+Tested up to: 6.9.1
+Stable tag: 3.33
 Requires at least: 4.7
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -88,7 +88,6 @@ If you find the Media Library Assistant plugin useful and would like to support 
 == Frequently Asked Questions ==
 
 = How can I sort the Media/Assistant submenu table on values such as File Size? =
-
 You can add support for many attachment metadata values such as file size by visiting the Custom Fields tab on the Settings page. There you can define a rule that maps the data to a WordPress custom field and check the "MLA Column" box to make that field a sortable column in the Media/Assistant submenu table. You can also use the field in your `[mla_gallery]` shortcodes. For example, this shortcode displays a gallery of the ten largest images in the "general" category, with a custom caption:
 
 `
@@ -96,7 +95,6 @@ You can add support for many attachment metadata values such as file size by vis
 `
 
 = How can I use Categories, Tags and custom taxonomies to select images for display in my posts and pages? =
-
 The powerful `[mla_gallery]` shortcode supports almost all of the query flexibility provided by the WP_Query class. You can find complete documentation in the Settings/Media Library Assistant Documentation tab. A simple example is in the preceding question. Here's an example that displays PDF documents with Att. Category "fauna" or Att. Tag "animal":
 
 `
@@ -104,21 +102,20 @@ The powerful `[mla_gallery]` shortcode supports almost all of the query flexibil
 `
 
 = Can I use [mla_gallery] for attachments other than images? =
-
 Yes! The `[mla_gallery]` shortcode supports all MIME types when you add the post_mime_type parameter to your query. You can build a gallery of your PDF documents, plain text files and other attachments. You can mix images and other MIME types in the same gallery, too. Here's an example that displays a gallery of PDF documents, using Imagick and Ghostscript to show the first page of each document as a thumbnail:
 
 `
 [mla_gallery post_mime_type=application/pdf post_parent=all link=file mla_viewer=true columns=1 orderby=date order=desc]
 `
 
-= Can the Assistant use the standard WordPress post Categories and Tags? =
+You can even use `[mla_gallery]` to compose "gallery" displays for other post types, e.g., posts and pages.
 
+= Can the Assistant use the standard WordPress post Categories and Tags? =
 Yes! You can activate or deactivate support for Categories and Tags at any time by visiting the Media Library Assistant Settings page.
 
 = Do I have to use the WordPress post Categories and Tags? =
 
 No! The Assistant supplies pre-defined Att. Categories and Att. Tags; these are WordPress custom taxonomies, with all of the API support that implies. You can activate or deactivate the pre-defined taxonomies at any time by visiting the Media Library Assistant Settings page.
-
 = Can I add my own custom taxonomies to the Assistant? =
 
 Yes. Any custom taxonomy you register with the Attachment post type will appear in the Assistant UI. Use the Media Library Assistant Settings page to add support for your taxonomies to the Assistant UI.
@@ -139,7 +136,6 @@ Most lightbox plugins use HTML `class=` and/or `rel=` tags to activate their fea
 In the example, the `mla_caption=` parameter turns the document title into a link to the shadowbox display so you can click on the thumbnail image or the caption to activate the display.
 
 = Why don't the "Posts" counts in the taxonomy edit screens match the search results when you click on them? =
-
 This is a known WordPress problem with multiple support tickets already in Trac, e.g., 
 Ticket #20708(closed defect (bug): duplicate) Wrong posts count in taxonomy table,
 Ticket #14084(assigned defect (bug)) Custom taxonomy count includes draft & trashed posts,
@@ -148,19 +144,15 @@ and Ticket #14076(closed defect (bug): duplicate) Misleading post count on taxon
 For example, if you add Tags support to the Assistant and then assign tag values to your attachments, the "Posts" column in the "Tags" edit screen under the Posts admin section includes attachments in the count. If you click on the number in that column, only posts and pages are displayed. There are similar issues with custom post types and taxonomies (whether you use the Assistant or not). The "Attachments" column in the edit screens added by the Assistant shows the correct count because it works in a different way.
 
 = Can I attach an image to more than one post or page? =
-
 No; that's a structural limitation of the WordPress database. However, you can use Categories, Tags and custom taxonomies to organize your images and associate them with posts and pages in any way you like. The `[mla_gallery]` shortcode makes it easy. You can also use the `ids=` parameter to compose a gallery from a list of specific images.
 
 = How do I "unattach" an item? =
-
 Hover over the item you want to modify and click the "Edit" or "Quick Edit" action. Set the ID portion of the Parent Info field to zero (0), then click "Update" to record your changes. If you change your mind, click "Cancel" to return to the main page without recording any changes. You can also click the "Select" button to bring up a list of posts//pages and select one to be the new parent for the item. The "Set Parent" link in the Media/Assistant submenu table also supports changing the parent and unattaching an item.
 
 = The Media/Assistant submenu seems sluggish; is there anything I can do to make it faster? =
-
 Some of the MLA features such as where-used reporting and ALT Text sorting/searching require a lot of database processing. If this is an issue for you, go to the Settings page and adjust the **"Where-used database access tuning"** settings. For any where-used category you can enable or disable processing. For the "Gallery in" and "MLA Gallery in" you can also choose to update the results on every page load or to cache the results for fifteen minutes between updates. The cache is also flushed automatically when posts, pages or attachments are inserted or updated.
 
 = Do custom templates and option settings survive version upgrades? =
-
 Rest assured, custom templates and all of your option settings persist unchanged whenever you update to a new MLA version.
 
 You can also back a backup of your templates and settings from the Settings/Media Library Assistant General tab. Scroll to the bottom of the page and click "Export ALL Settings" to create a backup file. You can create as many files as you like; they are date and time stamped so you can restore the one you want later.
@@ -170,12 +162,14 @@ In addition, you can deactivate and even delete the plugin without losing the se
 You can permanently delete the settings and (optionally) the backup files if you are removing MLA for good. The "Uninstall (Delete)" Plugin Settings section of the General tab enables these options.
 
 = Are other language versions available? =
-
 Not many, but all of the internationalization work in the plugin source code has been completed and there is a Portable Object Template (.POT) available in the "/languages" directory. I don't have working knowledge of anything but English, but if you'd like to volunteer to produce a translation, I would be delighted to work with you to make it happen. Have a look at the "MLA Internationalization Guide.pdf" file in the languages directory and get in touch.
 
 = What's in the "phpDocs" directory and do I need it? =
-
 All of the MLA source code has been annotated with "DocBlocks", a special type of comment used by phpDocumentor to generate API documentation. If you'd like a deeper understanding of the code, navigate to the [MLA phpDocs web page](http://davidlingren.com/assets/phpDocs/index.html "Read the API documentation") and have a look. Note that these pages require JavaScript for much of their functionality.
+
+= Where do I report security bugs found in this plugin? =
+
+Please report security bugs found in the source code of the Media LIbrary Assistant plugin through the [Patchstack Vulnerability Disclosure  Program](https://patchstack.com/database/vdp/1b29f6ff-db26-4d2c-a439-1f8afc17eb2e). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
 
 == Screenshots ==
 
@@ -203,6 +197,11 @@ All of the MLA source code has been annotated with "DocBlocks", a special type o
 
 == Changelog ==
 
+= 3.33 =
+* Fix: IMPORTANT: For the `[mla_tag_cloud]` and `[mla_term_list]` shortcodes, an SQL injection security risk has been mitigated.
+* Fix: A  WPML support defect causing a critical site error when duplicating an attachment in a new language has been corrected.
+* Fix: For all of the shortcodes, a defect in handling relative paths in pagination output formats has been corrected.
+* Fix: The priority of the hooks MLA adds to the "init" action has been adjusted to avoid a taxonomy registration conflict with the "Breadcrumb NavXT" plugin.
 = 3.32 =
 * Fix: A defect with taxonomy labels in the MMMW ATTACHMENT DETAILS pane causing a PHP "Undefined variable $label" message has been corrected.
 
@@ -224,30 +223,10 @@ All of the MLA source code has been annotated with "DocBlocks", a special type o
 * Fix: IMPORTANT: For the `[mla_gallery]` shortcode, the "Transfer by Item Name" feature has been redesigned to mitigate an Insecure Direct Object Reference security issue. This fix also requires you to manually update the "MLA Item Transfer Pretty Links" example plugin if your site uses it.
 * Fix: IMPORTANT: The "MLA Item Transfer Pretty Links" example plugin has been updated to use the new "Transfer by Item Name" method. **You must manually update the example plugin** if your site uses it.
 
-= 3.29 =
-* Fix: IMPORTANT: A Reflected Cross-Site Scripting security risk in all four shortcodes has been mitigated.
-* Fix: For the Media/Assistant submenu table, the "Download" rollover action has been repaired. This corrects a defect introduced in the MLA 3.28 update.
-* Fix: For the "Featured image" Media Manager Modal (popup) Window, a PHP warning when filtering the content with a custom field view/query has been eliminated.
-* Fix: For the "Attachment details" Media Manager Modal (popup) Window, toggling of the taxonomy term areas is restricted to clicking the taxonomy name (not the blank area to the left of the terms, if present).
-
-= 3.28 =
-* Fix: **IMPORTANT: For the `[mla_term_list]` shortcode, a defect that caused the famous "There Has Been a Critical Error on This Website" error has been corrected.**
-* Fix: IMPORTANT: An arbitrary file deletion security risk in the Media/Assistant submenu table has been mitigated.
-* Fix: When WPML is active, the flag images have been restored to the Media/Assistant submenu table column headers.
-* Fix: For the "MLA Gallery Download Checklist" example plugin (v1.01), an explicit check for ZIP archive support has been added to prevent a "Critical Site Error" occurance.
-* Fix: The `screen_options_show_screen` filter for the Settings/Media Library Assistant page has been updated to avoid a defect in Sugar Calendar Lite v3.8.0 (fixed in v3.8.1).
-
-= 3.27 =
-* New: For the `[mla_term_list]` shortcode, **the `checklist,div` output format wraps the list in an HTML "div" tag so, for example, you can add CSS styles to highlight the current list item or limit the size of the display area and add scroll bars to a long list.** More information in the Settings/Media Library Assistant Documentation tab.
-* New: EXIF metadata is extracted and available for AVIF files; requires ImageMagick version 7.0.25 or later and Imagick PHP support.
-* New: For the `[mla_gallery]` shortcode, **the `meta_date_key` parameter supports simple date searches and the `date_query` using any custom field instead of the Uploaded on date.** More information in the Settings/Media Library Assistant Documentation tab.
-* Fix: IMPORTANT: Reflected Cross-Site Scripting security risks in several `[mla_tag_cloud]` and `[mla_term_list]` shortcode parameters have been mitigated.
-* Fix: IMPORTANT: A Reflected Cross-Site Scripting security risk in the Select Parent modal window has been mitigated.
-* Fix: IMPORTANT: A Reflected Cross-Site Scripting security risk in the Settings/Media Library Assistant General tab has been mitigated.
-* Fix: When Polylang is active, correct a defect in preserving terms for untranslated taxonomies during the Bulk "Map IPTC/EXIF/WP metadata" action.
-* Fix: For the "MLA Taxonomy Archive Redirect" example plugin (v1.01), correct defect preventing AJAX operations from running to completion.
-
-= 3.00 - 3.26 =
+= 3.00 - 3.29 =
+* 3.29 - IMPORTANT: Security mitigation in all four shortcodes. Media Manager Modal (popup) and Media/Assistant submenu table fixes. Four fixes in all.
+* 3.28 - IMPORTANT: Security mitigation and [mla_term_list] critical error fix. WPML Media/Assistant fix. Five fixes in all.
+* 3.27 - IMPORTANT: Security fixes. Shortcode enhancements for term list checklists and custom field date queries, AVIF metadata support. Three enhancements and five fixes in all.
 * 3.26 - IMPORTANT: For the Polylang plugin, a defect that caused the famous "There Has Been a Critical Error on This Website" error has been corrected.
 * 3.25 - New tool for managing image Intermediate Sizes, taxonomy archive solution, new and enhanced example plugins and field-level data sources, WP 6.8 compatible. Eight enhancements, ten fixes in all.
 * 3.24 - IMPORTANT: Reflected Cross-Site Scripting security risks in three example plugins mitigated. Field-level data sources for very large images. REST support for Att. Categories and Att. Tags. Improved processing of the `mla_image_class` and `mla_image_alt` parameters. Two enhancements, two fixes in all.
@@ -256,7 +235,6 @@ All of the MLA source code has been annotated with "DocBlocks", a special type o
 * 3.21 - IMPORTANT: WP 6.7 i18n fix and a Cross-Site Scripting (XSS) security risk mitigation. Media/Assistant admin page fixes and enhancement. Three enhancements, ten fixes in all.
 * 3.20 - IMPORTANT: A security risk that allowed remote code execution from a logged in administrator account has been mitigated. Mapping rule and shortcode fixes. Four fixes in all.
 * 3.19 - IMPORTANT: A security risk in the Settings/Media Library Assistant Uploads tab has been mitigated. Mapping rule fixes and enhancement. Media/Assistant bulk action fix. One enhancement, six fixes in all.
-
 * 3.18 - IMPORTANT: A security risk in the Media/Edit Media screen has been mitigated. A defect in formatting the order=DESC shortcode parameter has been corrected. Two fixes in all.
 * 3.17 - IMPORTANT: Security risks in the Media/Edit Media screen and shortcodes have been mitigated. Elementor fix for the Media Manager Modal (popup) Window. Eight fixes in all.
 * 3.16 - IMPORTANT: Security risks in the Media/Edit Media screen and [mla_custom_list] shortcode have been mitigated. Shortcode bug fixes and a new feature in the MLA Multi-search Example plugin. One enhancement, four fixes in all.
@@ -399,8 +377,8 @@ All of the MLA source code has been annotated with "DocBlocks", a special type o
 
 == Upgrade Notice ==
 
-= 3.32 =
-IMPORTANT: A defect with taxonomy labels in the MMMW ATTACHMENT DETAILS pane causing a PHP "Undefined variable $label" message has been corrected.
+= 3.33 =
+IMPORTANT: Security fix for [mla_tag_cloud] and [mla_term_list], relative path fix for pagination controls and WPML fix. Four fixes in all.
 
 == Acknowledgements ==
 

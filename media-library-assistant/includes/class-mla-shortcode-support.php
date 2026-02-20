@@ -2256,6 +2256,21 @@ class MLAShortcode_Support {
 		}
 
 		$parts = wp_parse_url( $link_url );
+
+		if ( empty( $parts['scheme'] ) ) {
+			if ( 'HTTPS' === substr( $_SERVER["SERVER_PROTOCOL"], 0, 5 ) ) { // phpcs:ignore
+				$parts['scheme'] = 'https';
+			} else {
+				$parts['scheme'] = 'http';
+			}
+		}
+
+		if ( empty( $parts['host'] ) ) {
+			$parts['host'] = $_SERVER['HTTP_HOST']; // phpcs:ignore
+		}
+
+//error_log( __LINE__ . ' mla_process_pagination_link link_url = ' . var_export( $link_url, true ), 0 );
+//error_log( __LINE__ . ' mla_process_pagination_link parts = ' . var_export( $parts, true ), 0 );
 		$uri_path = empty( $parts['path'] ) ? '' : $parts['path'];
 		$uri_query = empty( $parts['query'] ) ? '' : $parts['query'];
 
@@ -4872,6 +4887,49 @@ class MLAShortcode_Support {
 	} // mla_get_all_none_term_counts
 
 	/**
+	 * Valid database fields for function mla_get_terms()
+	 *
+	 * @since 3.33
+	 *
+	 * @var	array
+	 */
+	private static $mla_get_terms_fields = array(
+		't.term_id',
+		't.name',
+		't.slug',
+		't.term_group',
+		't.term_icon',
+		'tt.term_taxonomy_id',
+		'tt.term_id',
+		'tt.taxonomy',
+		'tt.description',
+		'tt.parent',
+		'tt.count',
+		'COUNT(p.ID) AS `count`',
+	);
+
+	/**
+	 * Validate database fields in SELECT clause to prevent SQL injection attacks
+	 * 
+	 * @since 3.33
+	 *
+	 * @param	string	comma-separated string of qualified field names, e.g., tt.taxonomy
+	 *
+	 * @return	array	exploded array of validated field names, or false if validation fails
+	 */
+	private static function mla_validate_get_terms_fields( $fields ) {
+		$fields =  array_map( 'trim', explode( ',', $fields ) );
+
+		foreach ( $fields as $index => $field ) {
+			if ( ! in_array( $field, self::$mla_get_terms_fields ) ) {
+				unset( $fields[ $index ] );
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
 	 * Data selection parameters for [mla_tag_cloud], [mla_term_list]
 	 *
 	 * @since 2.20
@@ -4981,7 +5039,7 @@ class MLAShortcode_Support {
 		 */
 		$no_count = true;
 		$count_string = trim( strtolower( (string) $arguments['no_count'] ) );
-		$field_array = explode( ',', $arguments['fields'] );
+		$field_array = self::mla_validate_get_terms_fields( $arguments['fields'] );
 
 		switch ( $count_string ) {
 			case 'true':
