@@ -3,7 +3,7 @@ Contributors: dglingren
 Donate link: http://davidlingren.com/#donate
 Tags: categories, images, media, media library, tags
 Tested up to: 7.0
-Stable tag: 3.36
+Stable tag: 3.37
 Requires at least: 5.3.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -197,6 +197,11 @@ Please report security bugs found in the source code of the Media LIbrary Assist
 
 == Changelog ==
 
+= 3.37 =
+* Fix: IMPORTANT: For pagination shortcodes, a URL formatting defect introduced in MLA v3.36 has been corrected.
+* Fix: IMPORTANT: For the Media/Assistant submenu table, an SQL Injection security risk has been mitigated.
+* Fix: Simple date parameters can be used with `meta_date_key` for custom field date queries, as documented.
+
 = 3.36 =
 * Fix: IMPORTANT: For pagination shortcodes, a Cross Site Scripting security risk (Patchstack 31064) has been mitigated.
 * Fix: IMPORTANT: For the `[mla_archive_list]` shortcode, an SQL Injection security risk (Patchstack 30490) has been mitigated.
@@ -387,8 +392,8 @@ Please report security bugs found in the source code of the Media LIbrary Assist
 
 == Upgrade Notice ==
 
-= 3.36 =
-IMPORTANT: Five security fixes and a few other fixes as well. Nine fixes in all.
+= 3.37 =
+IMPORTANT: One security fix, pagination shortcode fix and a simple date query fix. Three fixes in all.
 
 == Acknowledgements ==
 

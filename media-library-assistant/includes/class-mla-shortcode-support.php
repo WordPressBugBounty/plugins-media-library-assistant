@@ -1910,7 +1910,7 @@ class MLAShortcode_Support {
 			 * Note that $link_href is used in the Google Viewer code below
 			 */
 			if ( ! empty( $arguments['mla_link_href'] ) ) {
-				$link_href = esc_url( self::mla_process_shortcode_parameter( $arguments['mla_link_href'], $item_values ) );
+				$link_href = sanitize_url( self::mla_process_shortcode_parameter( $arguments['mla_link_href'], $item_values ) );
 
 				// Replace single- and double-quote delimited values
 				$item_values['link'] = preg_replace('# href=\'([^\']*)\'#', " href='{$link_href}'", $item_values['link'] );
@@ -2460,7 +2460,7 @@ class MLAShortcode_Support {
 		if ( $prev_next && $current_page && 1 < $current_page ) {
 			$markup_values['new_page'] = $current_page - 1;
 			$new_title = ( ! empty( $arguments['mla_rollover_text'] ) ) ? 'title="' . esc_attr( self::mla_process_shortcode_parameter( $arguments['mla_rollover_text'], $markup_values ) ) . '" ' : '';
-			$new_url = esc_url( self::_replace_query_parameter( $mla_page_parameter, $current_page - 1, $new_base ) );
+			$new_url = self::_replace_query_parameter( $mla_page_parameter, $current_page - 1, $new_base );
 			$prev_text = ( ! empty( $arguments['mla_prev_text'] ) ) ? esc_attr( self::mla_process_shortcode_parameter( $arguments['mla_prev_text'], $markup_values ) ) : '&laquo; ' . __( 'Previous', 'media-library-assistant' );
 			$page_links[] = sprintf( '<a %1$sclass="prev page-numbers%2$s" %3$s%4$shref="%5$s">%6$s</a>',
 				/* %1$s */ $new_target,
@@ -2485,7 +2485,7 @@ class MLAShortcode_Support {
 			} else {
 				if ( $show_all || ( $new_page <= $end_size || ( $current_page && $new_page >= $current_page - $mid_size && $new_page <= $current_page + $mid_size ) || $new_page > $last_page - $end_size ) ) {
 					// build link
-					$new_url = esc_url( self::_replace_query_parameter( $mla_page_parameter, $new_page, $new_base ) );
+					$new_url = self::_replace_query_parameter( $mla_page_parameter, $new_page, $new_base );
 					$page_links[] = sprintf( '<a %1$sclass="page-numbers%2$s" %3$s%4$shref="%5$s">%6$s</a>',
 						/* %1$s */ $new_target,
 						/* %2$s */ $new_class,
@@ -2507,7 +2507,7 @@ class MLAShortcode_Support {
 			// build next link
 			$markup_values['new_page'] = $current_page + 1;
 			$new_title = ( ! empty( $arguments['mla_rollover_text'] ) ) ? 'title="' . esc_attr( self::mla_process_shortcode_parameter( $arguments['mla_rollover_text'], $markup_values ) ) . '" ' : '';
-			$new_url = esc_url( self::_replace_query_parameter( $mla_page_parameter, $current_page + 1, $new_base ) );
+			$new_url = self::_replace_query_parameter( $mla_page_parameter, $current_page + 1, $new_base );
 			$next_text = ( ! empty( $arguments['mla_next_text'] ) ) ? esc_attr( self::mla_process_shortcode_parameter( $arguments['mla_next_text'], $markup_values ) ) : __( 'Next', 'media-library-assistant' ) . ' &raquo;';
 			$page_links[] = sprintf( '<a %1$sclass="next page-numbers%2$s" %3$s%4$shref="%5$s">%6$s</a>',
 				/* %1$s */ $new_target,
@@ -2776,7 +2776,7 @@ class MLAShortcode_Support {
 		}
 
 		if ( ! empty( $arguments['mla_link_href'] ) ) {
-			$new_link .= 'href="' . esc_url( self::mla_process_shortcode_parameter( $arguments['mla_link_href'], $markup_values ) ) . '" >';
+			$new_link .= 'href="' . sanitize_url( self::mla_process_shortcode_parameter( $arguments['mla_link_href'], $markup_values ) ) . '" >';
 		} else {
 			$new_link .= 'href="' . $markup_values['new_url'] . '" >';
 		}
@@ -3750,6 +3750,8 @@ class MLAShortcode_Support {
 			}
 		}
 
+		// Convert simple date parameters to a date query when meta_date_key is present
+		$simple_date_query = array();
 		// $query_arguments has been initialized in the taxonomy code above.
 		$is_tax_query = ! ($use_children = empty( $query_arguments ));
 		foreach ($arguments as $key => $value ) {
@@ -4039,6 +4041,7 @@ class MLAShortcode_Support {
 			case 'year': // 4 digit year, e.g., 2021
 				if ( 4 === strlen( $value ) && is_numeric( $value ) ) {
 					$query_arguments[ $key ] = (int) $value;
+					$simple_date_query['year'] = (int) $value;
 					$use_children = false;
 				}
 
@@ -4048,6 +4051,7 @@ class MLAShortcode_Support {
 				$value = absint( $value );
 				if ( ( 0 < $value ) && ( 13 > $value ) ) {
 					$query_arguments[ $key ] = $value;
+					$simple_date_query['month'] = (int) $value;
 					$use_children = false;
 				}
 
@@ -4057,6 +4061,7 @@ class MLAShortcode_Support {
 				$value = absint( $value );
 				if ( ( 0 < $value ) && ( 54 > $value ) ) {
 					$query_arguments[ $key ] = $value;
+					$simple_date_query['week'] = (int) $value;
 					$use_children = false;
 				}
 
@@ -4066,6 +4071,7 @@ class MLAShortcode_Support {
 				$value = absint( $value );
 				if ( ( 0 < $value ) && ( 32 > $value ) ) {
 					$query_arguments[ $key ] = $value;
+					$simple_date_query['day'] = (int) $value;
 					$use_children = false;
 				}
 
@@ -4074,6 +4080,8 @@ class MLAShortcode_Support {
 			case 'm': //YearMonth, e.g., 202101
 				if ( 6 === strlen( $value ) && is_numeric( $value ) ) {
 					$query_arguments[ $key ] = (int) $value;
+					$simple_date_query['year'] = substr( $value, 0, 4 );
+					$simple_date_query['month'] = substr( $value, 4, 2 );
 					$use_children = false;
 				}
 
@@ -4134,9 +4142,24 @@ class MLAShortcode_Support {
 			} // switch $key
 		} // foreach $arguments 
 
+		if ( ( ! empty( $simple_date_query ) ) && ( ! empty( $query_arguments['meta_date_key'] ) ) ) {
+			// Convert simple date query parameters to a date query
+			unset( $query_arguments['year'], $query_arguments['monthnum'], $query_arguments['w'], $query_arguments['day'], $query_arguments['m'] );
+
+			if ( empty( $query_arguments['date_query'] ) ) {
+				$query_arguments['date_query'][0] = $simple_date_query;
+			} else {
+				if ( is_string( $query_arguments['date_query'] ) ) {
+					$query_arguments['date_query'] = self::_convert_query_parameter( 'meta_date_query', $query_arguments['date_query'], array( array( 'column' => 'post_date', 'year' => '9999' ) ) );
+				}
+
+				$query_arguments['date_query'][] = $simple_date_query;
+			}
+		}
+
 		if ( ! ( empty( $query_arguments['date_query'] ) || empty( $query_arguments['meta_date_key'] ) ) ) {
 			// Add custom date query column to query
-			$column = 'mtdate.' . $query_arguments['meta_date_key'];
+			$column = 'mtdate.' . esc_sql( $query_arguments['meta_date_key'] );
 			$revised_query = array();
 			foreach ( $query_arguments['date_query'] as $key => $value ) {
 				if ( is_array( $value ) ) {
@@ -4158,8 +4181,6 @@ class MLAShortcode_Support {
 
 			$query_arguments['custom_date_replacements'] = self::_convert_meta_date_query( $query_arguments['meta_date_key'], $revised_query );
 			$query_arguments['date_query'] = $revised_query;
-//error_log( __LINE__ . ' revised custom date query = ' . var_export( $revised_query, true ), 0 );
-//error_log( __LINE__ . ' custom_date_replacements = ' . var_export( $query_arguments['custom_date_replacements'], true ), 0 );
 		}
 
 		if ( ! ( empty( $query_arguments['meta_key'] ) || empty( $query_arguments['meta_value'] ) ) ) {
@@ -4585,12 +4606,12 @@ class MLAShortcode_Support {
 		 * modify the JOIN to include posts with no value for the metadata field.
 		 */
 		if ( self::$query_parameters[MLAQuery::MLA_ALT_TEXT_SUBQUERY] ) {
-			$sub_query = sprintf( 'SELECT post_id, meta_value FROM %1$s WHERE %1$s.meta_key = \'%2$s\'', $wpdb->postmeta, '_wp_attachment_image_alt' );
+			$sub_query = sprintf( 'SELECT post_id, meta_value FROM %1$s WHERE %1$s.meta_key = \'%2$s\'', $wpdb->postmeta, esc_sql( '_wp_attachment_image_alt' ) );
 			$join_clause .= sprintf( ' LEFT JOIN ( %1$s ) %2$s ON (%3$s.ID = %2$s.post_id)', $sub_query, MLAQuery::MLA_ALT_TEXT_SUBQUERY, $wpdb->posts );
 		}
 
 		if ( self::$query_parameters[MLAQuery::MLA_FILE_SUBQUERY] ) {
-			$sub_query = sprintf( 'SELECT post_id, meta_value FROM %1$s WHERE %1$s.meta_key = \'%2$s\'', $wpdb->postmeta, '_wp_attached_file' );
+			$sub_query = sprintf( 'SELECT post_id, meta_value FROM %1$s WHERE %1$s.meta_key = \'%2$s\'', $wpdb->postmeta, esc_sql( '_wp_attached_file' ) );
 			$join_clause .= sprintf( ' LEFT JOIN ( %1$s ) %2$s ON (%3$s.ID = %2$s.post_id)', $sub_query, MLAQuery::MLA_FILE_SUBQUERY, $wpdb->posts );
 		}
 

@@ -1093,6 +1093,9 @@ Remember to use <code>post_parent=current</code> if you want to restrict your qu
 <p>
 The <code>[mla_gallery]</code> shortcode supports six parameters for filtering the gallery display by year, month, week and day. For more complex date and time filters, see the "date query" feature in the next section below.
 </p>
+You can enter two or more of these parameters; they will be joined by "AND". For example, <code>[mla_gallery year=2026 monthnum=6 day=15]</code>.
+<p>
+</p>
 <table>
 <tr>
 <td class="mla-doc-table-label">year</td>
