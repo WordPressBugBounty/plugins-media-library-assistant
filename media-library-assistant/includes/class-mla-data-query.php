@@ -1226,7 +1226,7 @@ class MLAQuery {
 		if ( ( (int) $count ) > 0 ) {
 			$clean_request['offset'] = $offset;
 			$clean_request['posts_per_page'] = $count;
-		} elseif ( ( (int) $count ) == -1 ) {
+		} elseif ( ( (int) $count ) === -1 ) {
 			$clean_request['posts_per_page'] = $count;
 		}
 
@@ -1784,7 +1784,7 @@ class MLAQuery {
 
 //error_log( __LINE__ . " MLAQuery::_generate_tax_clause terms_search_parameters( {$index}, {$phrase} ) the_terms = " . var_export( $the_terms, true ), 0 );
 				foreach( $the_terms as $the_term ) {
-					$tax_terms[ $the_term->taxonomy ][ $the_term->term_id ] = (integer) $the_term->term_taxonomy_id;
+					$tax_terms[ $the_term->taxonomy ][ $the_term->term_id ] = (int) $the_term->term_taxonomy_id;
 
 					if ( isset( $tax_counts[ $the_term->taxonomy ][ $the_term->term_id ] ) ) {
 						$tax_counts[ $the_term->taxonomy ][ $the_term->term_id ]++;

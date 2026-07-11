@@ -3,7 +3,7 @@ Contributors: dglingren
 Donate link: http://davidlingren.com/#donate
 Tags: categories, images, media, media library, tags
 Tested up to: 7.0
-Stable tag: 3.38
+Stable tag: 3.39
 Requires at least: 5.3.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -197,6 +197,18 @@ Please report security bugs found in the source code of the Media LIbrary Assist
 
 == Changelog ==
 
+= 3.39 =
+* New: Shortcode material in the Settings/Media Library Assistant Documentation tab has been reorganized and improved.
+* New: For the `[mla_archive_list]` shortcode, new shortcode parameters have been added.
+* New: For the `[mla_tag_cloud]` shortcode, new output formats and pagination options have been added.
+* New: For the `[mla_gallery]` shortcode, a new "always_wrap"" pagination option has been added.
+* Fix: For the `[mla_custom_list]` shortcode, defects with the "ORDERBY" portion of database queries have been corrected.
+* Fix: For the `[mla_archive_list]` shortcode, defects with non-default "listtag_name" and "current_archive_class" have been corrected.
+* Fix: IMPORTANT: For pagination shortcodes, a Cross Site Scripting security risk (Patchstack 32618) has been mitigated.
+* Fix: Deprecation warnings for PHP 8.5+ have been corrected.
+* Fix: For WP 7.0, a Media Library Grid mode interference with the Modula and Real Media Library plugins has been corrected.
+* Fix: Support for old Admin Columns versions ( 6.0 and before ) has been disabled. The code will be removed in a future MLA update.
+
 = 3.38 =
 * New: For the `[mla_custom_list]` shortcode, new output formats and pagination options have been added.
 * Fix: IMPORTANT: For WP 7.0, Media Library Grid mode and MMMW popup window toolbar formatting defects have been corrected.
@@ -379,8 +391,8 @@ Please report security bugs found in the source code of the Media LIbrary Assist
 
 == Upgrade Notice ==
 
-= 3.38 =
-IMPORTANT: WP 7.0, Media Library Grid mode and MMMW popup window toolbar formatting fixes. [mla_custom_list] shortcode new output formats and pagination options. One enhancement, one  fix in all.
+= 3.39 =
+IMPORTANT: Cross Site Scripting security risk (Patchstack 32618) mitigation, shortcode and documentation enhancements, Media Library Grid mode and MMMW popup window toolbar format fixes. Four enhancements, six fixes in all.
 
 == Acknowledgements ==
 

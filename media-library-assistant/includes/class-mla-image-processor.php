@@ -351,7 +351,7 @@ class MLAImageProcessor {
 		$quality = isset( $args['quality'] ) ? abs( (int) $args['quality'] ) : 0;
 		$frame = isset( $args['frame'] ) ? abs( (int) $args['frame'] ) : 0;
 		$resolution = isset( $args['resolution'] ) ? abs( (int) $args['resolution'] ) : 72;
-		$best_fit = isset( $args['best_fit'] ) ? (boolean) $args['best_fit'] : false;
+		$best_fit = isset( $args['best_fit'] ) ? (bool) $args['best_fit'] : false;
 		$ghostscript_path = isset( $args['ghostscript_path'] ) ? $args['ghostscript_path'] : '';
 
 		// Retain WordPress type for _prepare_image and adjust defaults

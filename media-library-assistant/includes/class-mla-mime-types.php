@@ -371,7 +371,7 @@ class MLAMime {
 	 * @since 1.40
 	 *
 	 * @param	array	Mime types keyed by the file extension regex corresponding to those types
-	 * @param	mixed	User ID (integer) or object for checking against 'unfiltered_html' capability
+	 * @param	mixed	User ID (int) or object for checking against 'unfiltered_html' capability
 	 *
 	 * @return	array	Updated allowed MIME types
 	 */

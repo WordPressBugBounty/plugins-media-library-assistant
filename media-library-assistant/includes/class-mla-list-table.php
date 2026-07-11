@@ -1769,7 +1769,7 @@ class MLA_List_Table extends WP_List_Table {
 	 * @since 0.1
 	 * 
 	 * @return	array	Sortable column information,e.g.,
-	 * 					'slug' => array('data_value', (boolean) initial_descending )
+	 * 					'slug' => array('data_value', (bool) initial_descending )
 	 */
 	function get_sortable_columns( ) {
 		return apply_filters( 'mla_list_table_get_sortable_columns', self::$default_sortable_columns );
@@ -1856,7 +1856,7 @@ class MLA_List_Table extends WP_List_Table {
 				$base_url .= '=' . urlencode( sanitize_text_field( wp_unslash( $rml_folder ) ) );
 			}
 
-			if ( 0 < (integer) $rml_folder ) {
+			if ( 0 < (int) $rml_folder ) {
 				// Preserve RML ordering when view changes
 				if ( isset( $_REQUEST['orderby'] ) ) {
 					$orderby = sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) );
@@ -2192,9 +2192,9 @@ class MLA_List_Table extends WP_List_Table {
 		 */
 		$user = get_current_user_id();
 		$option = $this->screen->get_option( 'per_page', 'option' );
-		$per_page = (integer) get_user_meta( $user, $option, true );
+		$per_page = (int) get_user_meta( $user, $option, true );
 		if ( empty( $per_page ) || $per_page < 1 ) {
-			$per_page = (integer) $this->screen->get_option( 'per_page', 'default' );
+			$per_page = (int) $this->screen->get_option( 'per_page', 'default' );
 		}
 
 		$current_page = isset( $_REQUEST['paged'] ) ? absint( $_REQUEST['paged'] ) : 1;

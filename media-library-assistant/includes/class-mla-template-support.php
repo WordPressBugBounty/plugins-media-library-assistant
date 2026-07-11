@@ -74,7 +74,7 @@ class MLATemplate_Support {
 				),
 				'tag-cloud' => array(
 					'label' => 'Tag Cloud',
-					'default_names' => array( 'tag-cloud' ),
+					'default_names' => array( 'tag-cloud', 'tag-cloud-flat-div', 'tag-cloud-ul-div' ),
 					'sections' => array(
 						'description' => array(
 							'label' => 'Description',
@@ -196,7 +196,7 @@ class MLATemplate_Support {
 				),
 				'tag-cloud' => array(
 					'label' => 'Tag Cloud',
-					'default_names' => array( 'tag-cloud', 'tag-cloud-ul', 'tag-cloud-dl' ),
+					'default_names' => array( 'tag-cloud', 'tag-cloud-ul', 'tag-cloud-dl', 'tag-cloud-flat-div', 'tag-cloud-ul-div', 'tag-cloud-dl-div' ),
 					'sections' => array(
 						'description' => array(
 							'label' => 'Description',
@@ -428,7 +428,7 @@ class MLATemplate_Support {
 				),
 				'tag-cloud' => array(
 					'label' => _x( 'Tag Cloud', 'table_view_singular', 'media-library-assistant' ),
-					'default_names' => array( 'tag-cloud' ),
+					'default_names' => array( 'tag-cloud', 'tag-cloud-flat-div', 'tag-cloud-ul-div' ),
 					'sections' => array(
 						'description' => array(
 							'label' => __( 'Description', 'media-library-assistant' ),
@@ -550,7 +550,7 @@ class MLATemplate_Support {
 				),
 				'tag-cloud' => array(
 					'label' => _x( 'Tag Cloud', 'table_view_singular', 'media-library-assistant' ),
-					'default_names' => array( 'tag-cloud', 'tag-cloud-ul', 'tag-cloud-dl' ),
+					'default_names' => array( 'tag-cloud', 'tag-cloud-ul', 'tag-cloud-dl', 'tag-cloud-flat-div', 'tag-cloud-ul-div', 'tag-cloud-dl-div' ),
 					'sections' => array(
 						'description' => array(
 							'label' => __( 'Description', 'media-library-assistant' ),
