@@ -170,7 +170,7 @@ class CPAC_Deprecated_Storage_Model_MLA extends CPAC_Storage_Model {
 	public function is_current_screen() {
 		$is_current_screen = parent::is_current_screen();
 		if ( ! $is_current_screen ) {
-			if ( ! empty( $_REQUEST['page'] ) && MLACore::ADMIN_PAGE_SLUG == $_REQUEST['page'] ) {
+			if ( ! empty( $_GET['page'] ) && MLACore::ADMIN_PAGE_SLUG == $_GET['page'] ) {
 				$is_current_screen = true;
 			}
 		}
@@ -188,7 +188,7 @@ class CPAC_Deprecated_Storage_Model_MLA extends CPAC_Storage_Model {
 	public function is_columns_screen() {
 		$is_columns_screen = parent::is_columns_screen();
 		if ( ! $is_columns_screen ) {
-			if ( ! empty( $_REQUEST['page'] ) && MLACore::ADMIN_PAGE_SLUG == $_REQUEST['page'] ) {
+			if ( ! empty( $_GET['page'] ) && MLACore::ADMIN_PAGE_SLUG == $_GET['page'] ) {
 				$is_columns_screen = true;
 			}
 		}

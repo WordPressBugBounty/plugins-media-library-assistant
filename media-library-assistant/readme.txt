@@ -3,7 +3,7 @@ Contributors: dglingren
 Donate link: http://davidlingren.com/#donate
 Tags: categories, images, media, media library, tags
 Tested up to: 7.0
-Stable tag: 3.39
+Stable tag: 3.40
 Requires at least: 5.3.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -196,6 +196,16 @@ Please report security bugs found in the source code of the Media LIbrary Assist
 21. The Settings page Debug tab, where you can activate debug logging categories as well as manage and display the error log.
 
 == Changelog ==
+
+= 3.40 =
+* New: For the "MLA CSV Data Source Example" plugin, matching on file/item URL is now supported.
+* Fix: IMPORTANT: For five Settings tabs, a Cross Site Scripting security risk (Patchstack 33662) has been mitigated.
+* Fix: IMPORTANT: For one Settings tab, an Arbitrary File Upload security risk (Patchstack 33653) has been mitigated.
+* Fix: IMPORTANT: An SQL Injection security risk (credit Joao Ramos Maciel and WPScan) has been mitigated.
+* Fix: IMPORTANT: For all shortcodes, a Cross Site Scripting security risk (Patchstack 33204) has been mitigated.
+* Fix: IMPORTANT: For WP 7.1, Media Library Grid mode and MMMW popup window toolbar formatting changes have been accomodated.
+* Fix: IMPORTANT: For WP 7.1, Bulk actions checkbox handling changes have been accomodated.
+* Fix: For several example plugins, a defect in parsing general option values has been corrected.
 
 = 3.39 =
 * New: Shortcode material in the Settings/Media Library Assistant Documentation tab has been reorganized and improved.
@@ -391,8 +401,8 @@ Please report security bugs found in the source code of the Media LIbrary Assist
 
 == Upgrade Notice ==
 
-= 3.39 =
-IMPORTANT: Cross Site Scripting security risk (Patchstack 32618) mitigation, shortcode and documentation enhancements, Media Library Grid mode and MMMW popup window toolbar format fixes. Four enhancements, six fixes in all.
+= 3.40 =
+IMPORTANT: WP 7.1 fixes and four security risk mitigations. Example plugin fixes and enhancements. One enhancement, seven fixes in all.
 
 == Acknowledgements ==
 

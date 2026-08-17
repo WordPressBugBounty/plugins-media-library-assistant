@@ -298,16 +298,6 @@ class MLACoreOptions {
 	const MLA_MEDIA_MODAL_DETAILS_AUTOOPEN = 'media_modal_details_autoopen';
 
 	/**
-	 * Provides a unique name for the Media Manager orderby option
-	 */
-	const MLA_MEDIA_MODAL_ORDERBY = 'media_modal_orderby';
-
-	/**
-	 * Provides a unique name for the Media Manager order option
-	 */
-	const MLA_MEDIA_MODAL_ORDER = 'media_modal_order';
-
-	/**
 	 * Provides a unique name for the Media Manager Force Image Default Setings option
 	 */
 	const MLA_DELETE_OPTION_SETTINGS = 'delete_option_settings';
@@ -1071,24 +1061,6 @@ class MLACoreOptions {
 					'type' => 'checkbox',
 					'std' => '',
 					'help' => __( 'Check this option to automatically open all MLA-enhanced taxonomy meta boxes in the "ATTACHMENT DETAILS" pane<br>&nbsp;&nbsp;when the item is selected.', 'media-library-assistant' )),
-
-			self::MLA_MEDIA_MODAL_ORDERBY =>
-				array('tab' => '',
-					'name' => __( 'Media Manager Order By', 'media-library-assistant' ),
-					'type' => 'select',
-					'std' => 'default',
-					'options' => array('default', 'none', 'title_name'),
-					'texts' => array('&mdash; ' . __( 'Media Manager Default', 'media-library-assistant' ) . ' &mdash;', __( 'None', 'media-library-assistant' ), __( 'Title/Name', 'media-library-assistant' )),
-					'help' => __( 'If you want to override the Media Manager default,<br>&nbsp;&nbsp;select a column for the sort order of the Media Library listing.', 'media-library-assistant' )),
-
-			self::MLA_MEDIA_MODAL_ORDER =>
-				array('tab' => '',
-					'name' => __( 'Media Manager Order', 'media-library-assistant' ),
-					'type' => 'radio',
-					'std' => 'default',
-					'options' => array('default', 'ASC', 'DESC'),
-					'texts' => array( '&mdash; ' . __( 'Media Manager Default', 'media-library-assistant' ) . ' &mdash;', 'Ascending', 'Descending' ),
-					'help' => __( 'Choose the sort order.', 'media-library-assistant' )),
 
 			'attachment_display_settings_subheader' =>
 				array('tab' => 'general',
