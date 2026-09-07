@@ -946,6 +946,9 @@ var wp, wpAjax, ajaxurl, jQuery, _,
 				}
 
 				if ( ( 0 < toolbarHeight ) && ( toolbarHeight !== mlaModal.settings.oldHeight ) ) {
+					// WP 7.1 sets the position to absolute, which looks terrible
+					$( '.spinner', toolbar.secondary.$el ).css( 'position', 'static' );
+
 					if ( 'object' === typeof this.attachmentsWrapper ) {
 						this.attachmentsWrapper.$el.css( 'top', toolbarHeight + 'px' );
 					}

@@ -561,7 +561,7 @@ class MLA {
 
 		if ( $menu_position && !empty( $submenu['upload.php'] ) ) {
 			foreach ( $submenu['upload.php'] as $menu_order => $menu_item ) {
-				if ( MLACore::ADMIN_PAGE_SLUG == $menu_item[2] ) {
+				if ( MLACore::ADMIN_PAGE_SLUG === $menu_item[2] ) {
 					$submenu['upload.php'][$menu_position] = $menu_item;
 					unset( $submenu['upload.php'][$menu_order] );
 					ksort( $submenu['upload.php'] );

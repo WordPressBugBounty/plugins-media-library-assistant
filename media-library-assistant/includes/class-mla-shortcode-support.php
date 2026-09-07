@@ -239,6 +239,10 @@ class MLAShortcode_Support {
 
 				$src_file = $icon_dir . '/' . wp_basename( $src );
 				@list( $width, $height ) = getimagesize( $src_file );
+			} else {
+				$src = false;
+				$width = false;
+				$height = false;
 			}
 
 			if ( $src && $width && $height ) {
@@ -1108,6 +1112,11 @@ class MLAShortcode_Support {
 
 		// Look for user-specified alternate gallery shortcode
 		$processing_alt_ids_value = false;
+		$mla_alt_ids_value = NULL;
+		$mla_alt_ids_template = NULL;
+		$mla_alt_shortcode_args = NULL;
+		$mla_alt_shortcode_ids = NULL;
+
 		if ( is_string( $arguments['mla_alt_shortcode'] ) ) {
 			// Replace data-selection parameters with the "ids" list
 			$blacklist = array_merge( self::$mla_get_shortcode_attachments_parameters, self::$mla_get_shortcode_dynamic_attachments_parameters );
@@ -2320,6 +2329,8 @@ class MLAShortcode_Support {
 			if ( $test_key === urldecode( $test_key ) ) {
 				// Query argument names cannot have HTML special characters
 				if ( $test_key === htmlspecialchars ( $test_key, ENT_QUOTES, 'UTF-8' ) ) {
+					$test_key = urlencode( $test_key );
+
 					if ( is_array( $test_value ) ) {
 						$test_value = self::_build_clean_query( $test_value );
 						if ( ! empty( $test_value ) ) {
@@ -2698,7 +2709,7 @@ class MLAShortcode_Support {
 			$paged = absint( $arguments['paged'] );
 		}
 
-		if ( 0 == $paged ) {
+		if ( 0 === $paged ) {
 			$paged = 1;
 		}
 
@@ -2706,6 +2717,7 @@ class MLAShortcode_Support {
 			$paged = $max_page;
 		}
 
+		$new_page = 0;
 		switch ( $mla_output ) {
 			case 'previous_page':
 				if ( 1 < $paged ) {
@@ -2743,8 +2755,7 @@ class MLAShortcode_Support {
 				}
 
 				break;
-			case 'paginate_links':
-				$new_page = 0;
+			//case 'paginate_links':
 		}
 
 		$markup_values['current_page'] = $paged;
@@ -2753,13 +2764,13 @@ class MLAShortcode_Support {
 		$markup_values['posts_per_page'] = $posts_per_page;
 		$markup_values['found_rows'] = $found_rows;
 
-		if ( $paged ) {
+		if ( 0 !== $paged ) {
 			$markup_values['current_offset'] = ( $paged - 1 ) * $posts_per_page;
 		} else {
 			$markup_values['current_offset'] = 0;
 		}
 
-		if ( $new_page ) {
+		if ( 0 !== $new_page ) {
 			$markup_values['new_offset'] = ( $new_page - 1 ) * $posts_per_page;
 		} else {
 			$markup_values['new_offset'] = 0;
@@ -2788,8 +2799,8 @@ class MLAShortcode_Support {
 			$uri_query = add_query_arg( array(  $mla_page_parameter  => $new_page ), $uri_query );	
 		}
 
-		if ( ( 0 < strlen( $uri_query ) ) && ( '?' !== $uri_query[0] ) ) {
-			$uri_query = '?' . $uri_query;
+		if ( ( 0 < strlen( $uri_query ) ) && ( '?' === $uri_query[0] ) ) {
+			$uri_query = substr( $uri_query, 1 );
 		}
 
 		// Validate the query arguments to prevent cross-site scripting (reflection) attacks
@@ -2800,7 +2811,7 @@ class MLAShortcode_Support {
 		$markup_values['query_string'] = $clean_query;
 
 		if ( !empty( $clean_query ) ) {
-			$markup_values['request_uri'] = $uri_path . $clean_query;	
+			$markup_values['request_uri'] = $uri_path . '?' . $clean_query;	
 		} else {
 			$markup_values['request_uri'] = $uri_path;
 		}
@@ -2826,7 +2837,7 @@ class MLAShortcode_Support {
 			return self::_paginate_links( $output_parameters, $markup_values, $arguments, $found_rows, $output );
 		}
 
-		if ( 0 == $new_page ) {
+		if ( 0 === $new_page ) {
 			if ( ! empty( $arguments['mla_nolink_text'] ) ) {
 				return wp_kses( self::mla_process_shortcode_parameter( $arguments['mla_nolink_text'] . 'page', $markup_values ), 'post' );
 			} else {
@@ -5206,6 +5217,18 @@ class MLAShortcode_Support {
 			}
 		}
 
+		if ( is_array( $arguments['post_type'] ) ) {
+			$post_types = $arguments['post_type'];
+		} else {
+			$post_types = array( $arguments['post_type'] );
+		}
+
+		if ( is_array( $arguments['post_status'] ) ) {
+			$post_stati = $arguments['post_status'];
+		} else {
+			$post_stati = array( $arguments['post_status'] );
+		}
+
 		$clauses['fields'] = implode( ',', $field_array );
 		$clause = array ( 'INNER JOIN `' . $wpdb->term_taxonomy . '` AS tt ON t.term_id = tt.term_id' );
 		$clause_parameters = array();
@@ -5225,12 +5248,6 @@ class MLAShortcode_Support {
 			$clause[] = 'LEFT JOIN `' . $wpdb->posts . '` AS p ON ( tr.object_id = p.ID';
 
 			// Add type and status constraints
-			if ( is_array( $arguments['post_type'] ) ) {
-				$post_types = $arguments['post_type'];
-			} else {
-				$post_types = array( $arguments['post_type'] );
-			}
-
 			$placeholders = array();
 			foreach ( $post_types as $post_type ) {
 				$placeholders[] = '%s';
@@ -5238,12 +5255,6 @@ class MLAShortcode_Support {
 			}
 
 			$clause[] = 'AND p.post_type IN (' . join( ',', $placeholders ) . ')';
-
-			if ( is_array( $arguments['post_status'] ) ) {
-				$post_stati = $arguments['post_status'];
-			} else {
-				$post_stati = array( $arguments['post_status'] );
-			}
 
 			$placeholders = array();
 			foreach ( $post_stati as $post_status ) {

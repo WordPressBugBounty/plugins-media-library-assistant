@@ -433,6 +433,11 @@ class MLACoreOptions {
 	const MLA_BULK_EDIT_PRESETS_PER_USER = 'mla_bulk_edit_presets_per_user';
 
 	/**
+	 * Provides a unique name (per user) for the admin notices option
+	 */
+	const MLA_ADMIN_NOTICES_OPTION = 'mla_admin_notices';
+
+	/**
 	 * $mla_option_definitions defines the database options and admin page areas for setting/updating them
 	 *
 	 * The array must be populated at runtime in MLACoreOptions::mla_localize_option_definitions_array();
