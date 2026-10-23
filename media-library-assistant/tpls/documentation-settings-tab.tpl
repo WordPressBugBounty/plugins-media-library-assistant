@@ -7428,7 +7428,9 @@ There are twenty prefix values for field-level parameters. Prefix values must be
 		<td class="mla-doc-table-label">author</td>
 		<td>
 		Values assigned to the item's author; empty if the author cannot be determined.
-		These include any of the columns in the database users and usermeta tables, e.g., <code>[+author:user_nicename+]</code> or  <code>[+author:description+]</code>.<br />
+		These include several of the columns in the database users and usermeta tables, e.g., <code>[+author:user_nicename+]</code> or  <code>[+author:description+]</code>.<br />
+		&nbsp;<br />
+		For security reasons, the only values allowed are 'user_nicename', 'user_url', 'display_name', 'first_name', 'last_name', 'nickname', 'description', 'user_first', 'user_last', 'user_bio', and 'website'.<br />
 		&nbsp;<br />
 		The ",raw" option bypasses the code to sanitize the returned value. Use this option, for example, to allow HTML tags to be returned.<br />&nbsp;
 		</td>

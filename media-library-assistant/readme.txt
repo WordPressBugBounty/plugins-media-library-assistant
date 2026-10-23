@@ -2,7 +2,7 @@
 Contributors: dglingren
 Donate link: http://davidlingren.com/#donate
 Tags: categories, images, media, media library, tags
-Tested up to: 7.1.2
+Tested up to: 7.1.3
 Stable tag: 3.42
 Requires at least: 5.3.0
 Requires PHP: 7.4
@@ -198,6 +198,11 @@ Please report security bugs found in the source code of the Media LIbrary Assist
 21. The Settings page Debug tab, where you can activate debug logging categories as well as manage and display the error log.
 
 == Changelog ==
+
+= 3.43 =
+* Fix: IMPORTANT: A Sensitive Data Exposure vulnerability (Patchstack 37178) has been mitigated.
+* Fix: IMPORTANT: A Cross Site Request Forgery vulnerability (Patchstack 35557) mitigation has been improved.
+* Fix: IMPORTANT: For pagination shortcodes, a Reflected Cross Site Scripting security risk (Wordfence CVE-2026-103875) has been mitigated.
 
 = 3.42 =
 * Fix: IMPORTANT: A Cross Site Request Forgery vulnerability (Patchstack 35557) has been mitigated.
@@ -415,8 +420,8 @@ Please report security bugs found in the source code of the Media LIbrary Assist
 
 == Upgrade Notice ==
 
-= 3.42 =
-IMPORTANT: Four security vulnerabilities (Patchstack 34858, 35455, 35483, 35557) have been mitigated. Handling of damaged parameters in [mla_gallery] has been improved. For WPML, term synchronization fixes and updates to support WPML 5.0+. Six fixes in all.
+= 3.43 =
+IMPORTANT: Three security vulnerabilities (Patchstack 35557, 37178 and Wordfence CVE-2026-103875) have been mitigated. Three fixes in all.
 
 == Acknowledgements ==
 

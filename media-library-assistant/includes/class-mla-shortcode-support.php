@@ -2077,7 +2077,7 @@ class MLAShortcode_Support {
 			 * Note that $link_href is used in the Google Viewer code below
 			 */
 			if ( ! empty( $arguments['mla_link_href'] ) ) {
-				$link_href = sanitize_url( self::mla_process_shortcode_parameter( $arguments['mla_link_href'], $item_values ) );
+				$link_href = esc_url( self::mla_process_shortcode_parameter( $arguments['mla_link_href'], $item_values ) );
 
 				// Replace single- and double-quote delimited values
 				$item_values['link'] = preg_replace('# href=\'([^\']*)\'#', " href='{$link_href}'", $item_values['link'] );
@@ -2624,7 +2624,7 @@ class MLAShortcode_Support {
 
 		$new_attributes = ( ! empty( $arguments['mla_link_attributes'] ) ) ? MLAShortcode_Support::mla_esc_attr( self::mla_process_shortcode_parameter( $arguments['mla_link_attributes'], $markup_values ) ) . ' ' : '';
 
-		$new_base =  ( ! empty( $arguments['mla_link_href'] ) ) ? self::mla_process_shortcode_parameter( $arguments['mla_link_href'], $markup_values ) : $markup_values['new_url'];
+		$new_base =  ( ! empty( $arguments['mla_link_href'] ) ) ? esc_url( self::mla_process_shortcode_parameter( $arguments['mla_link_href'], $markup_values ) ) : $markup_values['new_url'];
 
 		// Build the array of page links
 		$page_links = array();
@@ -2941,7 +2941,7 @@ class MLAShortcode_Support {
 		}
 
 		if ( ! empty( $arguments['mla_link_href'] ) ) {
-			$new_link .= 'href="' . sanitize_url( self::mla_process_shortcode_parameter( $arguments['mla_link_href'], $markup_values ) ) . '" >';
+			$new_link .= 'href="' . esc_url( self::mla_process_shortcode_parameter( $arguments['mla_link_href'], $markup_values ) ) . '" >';
 		} else {
 			$new_link .= 'href="' . $markup_values['new_url'] . '" >';
 		}

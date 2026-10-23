@@ -1727,11 +1727,15 @@ class MLAData {
 							break;
 						}
 					}
-		
-					if ( property_exists( $author, $value['value'] ) ) {
-						$author_value = $author->{$value['value']};
+
+					if ( in_array( $value['value'], array( 'user_nicename', 'user_url', 'display_name', 'first_name', 'last_name', 'nickname', 'description', 'user_first', 'user_last', 'user_bio', 'website' ) ) ) {
+						if ( property_exists( $author, $value['value'] ) ) {
+							$author_value = $author->{$value['value']};
+						} else {
+							$author_value = $author->get( $value['value'] );
+						}
 					} else {
-						$author_value = $author->get( $value['value'] );
+						$author_value = ''; // Security violation
 					}
 		
 					$raw_format = 'raw' === $value['format'];
