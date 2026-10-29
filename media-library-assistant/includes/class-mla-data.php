@@ -524,8 +524,8 @@ class MLAData {
 		if ( ! isset( $node['type'] ) ) {
 			foreach ( $node as $value ) {
 				$node_result = self::_evaluate_template_array_node( $value, $markup_values );
-				foreach ( $node_result as $value )
-					$result[] = $value;
+				foreach ( $node_result as $node_value )
+					$result[] = $node_value;
 			}
 		} else { // array of sub-nodes
 			switch ( $node['type'] ) {
@@ -537,13 +537,13 @@ class MLAData {
 
 					if ( isset( $node_value['type'] ) ) {
 						$node_result = self::_evaluate_template_array_node( $node_value, $markup_values );
-						foreach ( $node_result as $value )
-							$result[] = $value;
+						foreach ( $node_result as $node_value )
+							$result[] = $node_value;
 					} else { // single node
 						foreach ( $node_value as $value ) {
 							$node_result = self::_evaluate_template_array_node( $value, $markup_values );
-							foreach ( $node_result as $value )
-								$result[] = $value;
+							foreach ( $node_result as $node_value )
+								$result[] = $node_value;
 						}
 					} // array of nodes
 
@@ -564,8 +564,8 @@ class MLAData {
 					foreach ( $node['value'] as $value ) {
 						$node_result = self::_evaluate_template_array_node( $value, $markup_values );
 						if ( ! empty( $node_result ) ) {
-							foreach ( $node_result as $value )
-								$result[] = $value;
+							foreach ( $node_result as $node_value )
+								$result[] = $node_value;
 							break;
 						}
 					}
@@ -574,8 +574,8 @@ class MLAData {
 				case 'template':
 					foreach ( $node['value'] as $value ) {
 						$node_result = self::_evaluate_template_array_node( $value, $markup_values );
-						foreach ( $node_result as $value )
-							$result[] = $value;
+						foreach ( $node_result as $node_value )
+							$result[] = $node_value;
 					}
 
 					break;
@@ -1647,6 +1647,11 @@ class MLAData {
 					}
 		
 					if ( 0 === $parent_id ) {
+						$markup_values[ $markup_key ] = '';
+						break;
+					}
+		
+					if ( 'post_password' === $value['value'] ) {
 						$markup_values[ $markup_key ] = '';
 						break;
 					}
@@ -5130,15 +5135,15 @@ return $results;
 
 			// mla_fetch_attachment_metadata doesn't return "hidden" fields
 			if ( '_' === $meta_key[0] ) {
-				$old_meta_value = get_post_meta( $post_id, $meta_key );
+				$old_meta_value = get_metadata( 'post', $post_id, $meta_key );
 
 				if ( ! empty( $old_meta_value ) ) {
 					if ( is_array( $old_meta_value ) ) {
-						if ( count( $old_meta_value ) == 1 ) {
-							$old_meta_value = maybe_unserialize( current( $old_meta_value ) );
+						if ( count( $old_meta_value ) === 1 ) {
+							$old_meta_value = current( $old_meta_value );
 						} else {
 							foreach ( $old_meta_value as $single_key => $single_value ) {
-								$old_meta_value[ $single_key ] = maybe_unserialize( $single_value );
+								$old_meta_value[ $single_key ] = $single_value;
 							}
 						}
 					}

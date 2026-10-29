@@ -2082,10 +2082,12 @@ class MLA {
 
 		if ( ! empty( $custom_fields ) ) {
 			$_REQUEST[ 'custom_updates' ] = $custom_fields;
+		} else {
+			unset( $_REQUEST[ 'custom_updates' ] );
 		}
 
 		// The category taxonomy is a special case because post_categories_meta_box() changes the input name
-		if ( !isset( $_REQUEST['tax_input'] ) ) {
+		if ( ! isset( $_REQUEST['tax_input'] ) ) {
 			$_REQUEST['tax_input'] = array();
 		}
 
@@ -2158,7 +2160,6 @@ class MLA {
 				$_REQUEST['post_date_gmt'] = get_gmt_from_date( $new_date );
 			}
 
-//			$results = MLAData::mla_update_single_item( $post_id, $_REQUEST, $tax_output );
 			$results = MLAData::mla_update_single_item( $post_id, $_REQUEST, $_REQUEST['tax_input'] ); // phpcs:ignore
 			MLACore::mla_debug_add( __LINE__ . " MLA::mla_inline_edit_ajax_action( {$post_id} ) results = " . var_export( $results, true ), MLACore::MLA_DEBUG_CATEGORY_AJAX );
 		}
