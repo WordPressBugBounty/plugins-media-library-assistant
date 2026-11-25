@@ -284,6 +284,12 @@ class MLA_List_Table extends WP_List_Table {
 			ob_end_clean();
 		}
 
+		// Patch all and none values to be consistent with the custom field filter dropdown
+		if ( !empty( $dropdown ) ) {
+			$dropdown = str_replace( "value='0'", 'class="level-0" value="0"', $dropdown );
+			$dropdown = str_replace( "value='-1'", 'class="level-0" value="-1"', $dropdown );
+		}
+
 		return $dropdown;
 	}
 

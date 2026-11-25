@@ -1776,7 +1776,7 @@ class MLA_Custom_Fields_List_Table extends WP_List_Table {
 			$base_url = 'options-general.php?page=' . MLACoreOptions::MLA_SETTINGS_SLUG . '-custom_field&mla_tab=custom_field';
 
 			if ( isset( $_REQUEST['s'] ) ) {
-				$base_url = add_query_arg( array( 's' => wp_kses( wp_unslash( $_REQUEST['s'] ), 'post' ) ), $base_url );
+				$base_url = add_query_arg( array( 's' => urlencode( wp_kses( wp_unslash( $_REQUEST['s'] ), 'post' ) ) ), $base_url );
 			}
 		}
 
@@ -1800,7 +1800,7 @@ class MLA_Custom_Fields_List_Table extends WP_List_Table {
 		$current_view = isset( $_REQUEST['mla_custom_field_view'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['mla_custom_field_view'] ) ) : 'all';
 
 		// Generate the list of views, retaining keyword search criterion
-		$s = wp_kses( isset( $_REQUEST['s'] ) ? wp_unslash( $_REQUEST['s'] ) : '', 'post' );
+		$s = urlencode( wp_kses( isset( $_REQUEST['s'] ) ? wp_unslash( $_REQUEST['s'] ) : '', 'post' ) );
 		$custom_field_items = MLA_Custom_Field_Query::mla_tabulate_custom_field_items( $s );
 		$view_links = array();
 		foreach ( $custom_field_items as $slug => $item )

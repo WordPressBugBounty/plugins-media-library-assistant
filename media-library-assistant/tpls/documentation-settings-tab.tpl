@@ -1358,7 +1358,7 @@ You can query by author's id or &quot;Username&quot;, the value used to log in t
 For compatibility with the WordPress <code>[gallery]</code> shortcode, these parameters default to <code>post_type=attachment</code>, <code>post_status=inherit</code>. You can override the defaults to, for example, display posts and pages (<code>post_status=publish</code>). You can specify more than one value in a comma-separated list, e.g., <code>post_type="post,page"</code>.
 </p>
 <p>
-For security reasons, post_status values 'draft', 'future', 'pending', 'private' and 'trash' are not allowed.
+For security reasons, non-public <code>post_type</code> and <code>post_status</code> values are restricted to logged in users with Administrator privileges.
 </p>
 <p>
 You can change the <code>post_type</code> parameter to compose a "gallery" of WordPress objects such as posts, pages and custom post types. For example, to display a gallery of the published posts in a particular category you can code something like:
@@ -2954,15 +2954,15 @@ The <strong>"mla_output"</strong> parameter determines the type of output the sh
 </tr>
 <tr>
 <td class="mla-doc-table-label">next_page</td>
-<td>Returns a link to the next "page" of list items, based on the "mla_custom_list_current" parameter value. The optional ",wrap" or ",last" qualifiers determine what happens at the end of the list. If you omit the qualifier, an empty string is returned for the "next_page" if there are no more items in the list. If you code the ",wrap" qualifier, the "next_page" from the last page of items will be to the first page. If you code the ",last" qualifier, the "next_page" link will return to/remain on the last page.</td>
+<td>Returns a link to the next "page" of list items, based on the "mla_archive_list_current" parameter value. The optional ",wrap" or ",last" qualifiers determine what happens at the end of the list. If you omit the qualifier, an empty string is returned for the "next_page" if there are no more items in the list. If you code the ",wrap" qualifier, the "next_page" from the last page of items will be to the first page. If you code the ",last" qualifier, the "next_page" link will return to/remain on the last page.</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">previous_page</td>
-<td>Returns a link to the previous "page" of list items, based on the "mla_custom_list_current" parameter value. The optional ",wrap" or ",first" qualifiers determine what happens at the beginning of the list. If you omit the qualifier, an empty string is returned for the "previous_link" from the first page. If you code the ",wrap" qualifier, "previous_page" from the first page will be to the last page. If you code the ",first" qualifier, the "previous_link" link will return to/remain on the first page.</td>
+<td>Returns a link to the previous "page" of list items, based on the "mla_archive_list_current" parameter value. The optional ",wrap" or ",first" qualifiers determine what happens at the beginning of the list. If you omit the qualifier, an empty string is returned for the "previous_link" from the first page. If you code the ",wrap" qualifier, "previous_page" from the first page will be to the last page. If you code the ",first" qualifier, the "previous_link" link will return to/remain on the first page.</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">paginate_links</td>
-<td>Returns a link to the first and last "pages" of the list and to pages around the current "list page" ( e.g.: « Previous 1 ... 3 4 5 6 7 ... 9 Next » ), based on the "mla_custom_list_current" parameter value. The optional ",show_all" qualifier will show all of the list pages instead of a short list around the current page. The optional ",prev_next" qualifier will include the "« Previous" and "Next »" portions of the link list.</td>
+<td>Returns a link to the first and last "pages" of the list and to pages around the current "list page" ( e.g.: « Previous 1 ... 3 4 5 6 7 ... 9 Next » ), based on the "mla_archive_list_current" parameter value. The optional ",show_all" qualifier will show all of the list pages instead of a short list around the current page. The optional ",prev_next" qualifier will include the "« Previous" and "Next »" portions of the link list.</td>
 </tr>
 </table>
 <p>
@@ -2983,7 +2983,7 @@ The "paginate_values" format returns an empty string if the archive list is empt
 </tr>
 <tr>
 <td class="mla-doc-table-label">offset</td>
-<td>the number of terms to skip over before starting the current list page. This parameter is usually derived automatically from the more useful "mla_custom_list_current" parameter.</td>
+<td>the number of terms to skip over before starting the current list page. This parameter is usually derived automatically from the more useful "mla_archive_list_current" parameter.</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">mla_archive_list_current</td>
@@ -2991,7 +2991,7 @@ The "paginate_values" format returns an empty string if the archive list is empt
 </tr>
 <tr>
 <td class="mla-doc-table-label">mla_page_parameter</td>
-<td>the name of the parameter containing the current page number; default "mla_custom_list_current". You can change the name if you need multiple paginated lists on one post/page. The name is limited to alphanumeric characters, underscore (_) and dash (-)/td>
+<td>the name of the parameter containing the current page number; default "mla_archive_list_current". You can change the name if you need multiple paginated lists on one post/page. The name is limited to alphanumeric characters, underscore (_) and dash (-)/td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">mla_paginate_total</td>
@@ -2999,7 +2999,7 @@ The "paginate_values" format returns an empty string if the archive list is empt
 </tr>
 <tr>
 <td class="mla-doc-table-label">mla_paginate_rows</td>
-<td>If you have some other way of computing the total number of values you want to paginate you can use <code>mla_paginate_rows</code> to simplify your shortcode parameters and avoid redundant database access. If, for example, you want pagination controls for a list that you know has fifty values you can code <code>[mla_custom_list mla_output=paginate_links mla_paginate_rows=50]</code> and then add any other page selection or list display content parameters you need.</td>
+<td>If you have some other way of computing the total number of values you want to paginate you can use <code>mla_paginate_rows</code> to simplify your shortcode parameters and avoid redundant database access. If, for example, you want pagination controls for a list that you know has fifty values you can code <code>[mla_archive_list mla_output=paginate_links mla_paginate_rows=50]</code> and then add any other page selection or list display content parameters you need.</td>
 </tr>
 </table>
 <p>
@@ -3104,11 +3104,11 @@ You can use any of the List-specific substitution parameters in your next/previo
 </tr>
 <tr>
 <td class="mla-doc-table-label">current_page_text</td>
-<td>'mla_custom_list_current="[+current_page+]"'</td>
+<td>'mla_archive_list_current="[+current_page+]"'</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">new_page_text</td>
-<td>'mla_custom_list_current="[+new_page+]"'</td>
+<td>'mla_archive_list_current="[+new_page+]"'</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">last_page_text</td>
@@ -3132,7 +3132,7 @@ You can use any of the List-specific substitution parameters in your next/previo
 </tr>
 <tr>
 <td class="mla-doc-table-label">request_uri</td>
-<td>the URI given to access the page, e.g., "wordpress/2013/06/sample-post" or "wordpress/tag-gallery-page?attachment_tag=sample". MLA manages pagination by adding the "mla_custom_list_current" query parameter to the URI value</td>
+<td>the URI given to access the page, e.g., "wordpress/2013/06/sample-post" or "wordpress/tag-gallery-page?attachment_tag=sample". MLA manages pagination by adding the "mla_archive_list_current" query parameter to the URI value</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">new_url</td>
@@ -4056,11 +4056,11 @@ Use the name/slug of each taxonomy, not the display name, e.g., 'post_tag', 'cat
 </tr>
 <tr>
 <td class="mla-doc-table-label">post_type</td>
-<td>The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">post type(s)</a> of the items to include in the term-specific counts. The default is "attachment". You can override the default if you want to count other types for which the taxonomy is registered, e.g., "post" to count Posts in the "category" and "post_tag" taxonomies. The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">Codex Page</a> documents other post type values. Make sure your "post_status" and "post_type" values are consistent, e.g., use <code>post_type="attachment,post" post_status="inherit,publish"</code> together.</td>
+<td>The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">post type(s)</a> of the items to include in the term-specific counts. The default is "attachment". You can override the default if you want to count other types for which the taxonomy is registered, e.g., "post" to count Posts in the "category" and "post_tag" taxonomies. The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">Codex Page</a> documents other post type values. Make sure your "post_status" and "post_type" values are consistent, e.g., use <code>post_type="attachment,post" post_status="inherit,publish"</code> together. For security reasons, non-public <code>post_type</code> values are restricted to logged in users with Administrator privileges.</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">post_status</td>
-<td>The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">post status value(s)</a> of the items to include in the term-specific counts. The default is "inherit", which counts attachments (Media Library Items). You can override the default if you want to count other values, e.g., "publish" to count published Posts in the "category" and "post_tag" taxonomies. If you code "private" and the user is not logged in, "private" will be removed. The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">Codex page</a> documents other post status values.</td>
+<td>The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">post status value(s)</a> of the items to include in the term-specific counts. The default is "inherit", which counts attachments (Media Library Items). You can override the default if you want to count other values, e.g., "publish" to count published Posts in the "category" and "post_tag" taxonomies. The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">Codex page</a> documents other post status values. For security reasons, non-public <code>post_status</code> values are restricted to logged in users with Administrator privileges.</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">minimum</td>
@@ -4277,11 +4277,11 @@ You can use any of the Cloud-specific substitution parameters in your next/previ
 </tr>
 <tr>
 <td class="mla-doc-table-label">current_page_text</td>
-<td>'mla_custom_list_current="[+current_page+]"'</td>
+<td>'mla_cloud_current="[+current_page+]"'</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">new_page_text</td>
-<td>'mla_custom_list_current="[+new_page+]"'</td>
+<td>'mla_cloud_current="[+new_page+]"'</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">last_page_text</td>
@@ -4305,7 +4305,7 @@ You can use any of the Cloud-specific substitution parameters in your next/previ
 </tr>
 <tr>
 <td class="mla-doc-table-label">request_uri</td>
-<td>the URI given to access the page, e.g., "wordpress/2013/06/sample-post" or "wordpress/tag-gallery-page?attachment_tag=sample". MLA manages pagination by adding the "mla_custom_list_current" query parameter to the URI value</td>
+<td>the URI given to access the page, e.g., "wordpress/2013/06/sample-post" or "wordpress/tag-gallery-page?attachment_tag=sample". MLA manages pagination by adding the "mla_cloud_current" query parameter to the URI value</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">new_url</td>
@@ -5287,11 +5287,11 @@ Use the name/slug of each taxonomy, not the display name, e.g., 'post_tag', 'cat
 </tr>
 <tr>
 <td class="mla-doc-table-label">post_type</td>
-<td>The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">post type(s)</a> of the items to include in the term-specific counts. The default is "attachment". You can override the default if you want to count other types for which the taxonomy is registered, e.g., "post" to count Posts in the "category" and "post_tag" taxonomies. The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">Codex Page</a> documents other post type values. Make sure your "post_status" and "post_type" values are consistent, e.g., use <code>post_type="attachment,post" post_status="inherit,publish"</code> together.</td>
+<td>The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">post type(s)</a> of the items to include in the term-specific counts. The default is "attachment". You can override the default if you want to count other types for which the taxonomy is registered, e.g., "post" to count Posts in the "category" and "post_tag" taxonomies. The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">Codex Page</a> documents other post type values. Make sure your "post_status" and "post_type" values are consistent, e.g., use <code>post_type="attachment,post" post_status="inherit,publish"</code> together. For security reasons, non-public <code>post_type</code> values are restricted to logged in users with Administrator privileges.</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">post_status</td>
-<td>The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">post status value(s)</a> of the items to include in the term-specific counts. The default is "inherit", which counts attachments (Media Library Items). You can override the default if you want to count other values, e.g., "publish" to count published Posts in the "category" and "post_tag" taxonomies. If you code "private" and the user is not logged in, "private" will be removed. The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">Codex page</a> documents other post status values.</td>
+<td>The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">post status value(s)</a> of the items to include in the term-specific counts. The default is "inherit", which counts attachments (Media Library Items). You can override the default if you want to count other values, e.g., "publish" to count published Posts in the "category" and "post_tag" taxonomies. The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">Codex page</a> documents other post status values. For security reasons, non-public <code>post_status</code> values are restricted to logged in users with Administrator privileges.</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">minimum</td>
@@ -6250,11 +6250,11 @@ The data selection parameters specify which custom field values are returned for
 </tr>
 <tr>
 <td class="mla-doc-table-label">post_type</td>
-<td>The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">post type(s)</a> of the items to include in value selection and value-specific counts. <strong>The default is "attachment"</strong>. You can override the default if you want to select other types for which the custom field is used, e.g., "post" to select Posts. The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">Codex Page</a> documents other post type values. Make sure your "post_status" and "post_type" values are consistent, e.g., use <code>post_type="attachment,post" post_status="inherit,publish"</code> together.</td>
+<td>The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">post type(s)</a> of the items to include in value selection and value-specific counts. <strong>The default is "attachment"</strong>. You can override the default if you want to select other types for which the custom field is used, e.g., "post" to select Posts. The <a href="http://codex.wordpress.org/Post_Types" title="WordPress Codex &quot;Post Types&quot; page" target="_blank">Codex Page</a> documents other post type values. Make sure your "post_status" and "post_type" values are consistent, e.g., use <code>post_type="attachment,post" post_status="inherit,publish"</code> together. For security reasons, non-public <code>post_type</code> values are restricted to logged in users with Administrator privileges.</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">post_status</td>
-<td>The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">post status value(s)</a> of the items to include in value selection and value-specific counts. <strong>The default is "inherit"</strong>, which counts attachments (Media Library Items). You can override the default if you want to count other values, e.g., "publish" to count published Posts. If you code "private" and the user is not logged in, "private" will be removed. The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">Codex page</a> documents other post status values.</td>
+<td>The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">post status value(s)</a> of the items to include in value selection and value-specific counts. <strong>The default is "inherit"</strong>, which counts attachments (Media Library Items). You can override the default if you want to count other values, e.g., "publish" to count published Posts. The <a href="http://codex.wordpress.org/Post_Status" title="WordPress Codex &quot;Post Status&quot; page" target="_blank">Codex page</a> documents other post status values. For security reasons, non-public <code>post_status</code> values are restricted to logged in users with Administrator privileges.</td>
 </tr>
 <tr>
 <td class="mla-doc-table-label">ids</td>

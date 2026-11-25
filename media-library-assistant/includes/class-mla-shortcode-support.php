@@ -425,7 +425,97 @@ class MLAShortcode_Support {
 		}
 
 		return $width_string;
+	}
+
+	/**
+	 * Validate the post_type parameter for all shortcodes
+	 *
+	 * @since 3.45
+	 *
+	 * @param	string	$post_types Post type value(s) to be validated
+	 * @param	string	$default Optional. Default post type value, if not provided, 'attachment'
+	 *
+	 * @return	array	validated post type value(s)
+	 */
+	public static function mla_validate_post_types( $post_types, $default = 'attachment' ) {
+		if ( current_user_can( 'manage_options' ) ) {
+			$registered_post_types = get_post_types( array(), 'names' );
+			$registered_post_types['any'] = 'any'; // all public types, including attachments
+		} else {
+			$registered_post_types = get_post_types( array( 'public' => true ), 'names' );
 		}
+
+		$valid_post_types = array();
+
+		if ( is_string( $post_types ) ) {
+			$test_post_types = explode( ',', $post_types );
+		} else {
+			$test_post_types = (array) $post_types;
+		}
+
+		foreach ( $test_post_types as $post_type ) {
+			$post_type = strtolower( trim( $post_type ) );
+			if ( ! empty( $post_type ) ) {
+				if ( ! in_array( $post_type, $registered_post_types ) ) {
+					continue;
+				}
+
+				$valid_post_types[] = $post_type;
+			}
+		}
+
+		if ( empty( $valid_post_types )  ) {
+			$post_types = strtolower( trim( $default ) );
+			$valid_post_types = explode( ',', $post_types );
+		}
+
+		return $valid_post_types;
+	}
+
+	/**
+	 * Validate the post_status parameter for all shortcodes
+	 *
+	 * @since 3.45
+	 *
+	 * @param	string	$post_stati Post status value(s) to be validated
+	 * @param	string	$default Optional. Default post status value, if not provided, 'inherit'
+	 *
+	 * @return	array	validated post status value(s)
+	 */
+	public static function mla_validate_post_stati( $post_stati, $default = 'inherit' ) {
+		if ( current_user_can( 'manage_options' ) ) {
+			$registered_post_stati = get_post_stati( array(), 'names' );
+		} else {
+			$registered_post_stati = get_post_stati( array( 'public' => true ), 'names' );
+		}
+		$registered_post_stati['inherit'] = 'inherit'; // for attachments
+
+		$valid_post_stati = array();
+
+		if ( is_string( $post_stati ) ) {
+			$test_post_stati = explode( ',', $post_stati );
+		} else {
+			$test_post_stati = (array) $post_stati;
+		}
+
+		foreach ( $test_post_stati as $post_status ) {
+			$post_status = strtolower( trim( $post_status ) );
+			if ( ! empty( $post_status ) ) {
+				if ( ! in_array( $post_status, $registered_post_stati ) ) {
+					continue;
+				}
+
+				$valid_post_stati[] = $post_status;
+			}
+		}
+
+		if ( empty( $valid_post_stati )  ) {
+			$post_stati = strtolower( trim( $default ) );
+			$valid_post_stati = explode( ',', $post_stati );
+		}
+
+		return $valid_post_stati;
+	}
 
 	/**
 	 * Make sure $attr is an array, repair line-break damage, merge with $content
@@ -841,7 +931,7 @@ class MLAShortcode_Support {
 		 */
 		if ( ! isset( $attr[ $mla_page_parameter ] ) ) {
 			if ( isset( $_REQUEST[ $mla_page_parameter ] ) ) {
-				$attr[ $mla_page_parameter ] = sanitize_text_field( wp_unslash( $_REQUEST[ $mla_page_parameter ] ) );
+				$attr[ $mla_page_parameter ] = absint( $_REQUEST[ $mla_page_parameter ] );
 			}
 		}
 
@@ -1034,7 +1124,12 @@ class MLAShortcode_Support {
 			}
 		}
 
-		self::$mla_debug = ( ! empty( $arguments['mla_debug'] ) ) ? trim( strtolower( $arguments['mla_debug'] ) ) : false;
+		if ( current_user_can( 'edit_posts' ) ) {
+			self::$mla_debug = ( ! empty( $arguments['mla_debug'] ) ) ? trim( strtolower( $arguments['mla_debug'] ) ) : false;
+		} else {
+			self::$mla_debug = false;
+		}
+
 		if ( self::$mla_debug ) {
 			if ( 'true' === self::$mla_debug ) {
 				MLACore::mla_debug_mode( 'buffer' );
@@ -1235,6 +1330,15 @@ class MLAShortcode_Support {
 			// Other MLA shortcodes use some of the same parameters, e.g., mla_link_href, so let them thru
 			if ( !in_array( $arguments['mla_alt_shortcode'], array( 'mla_tag_cloud', 'mla_term_list' ) ) ) {
 				$blacklist = array_merge( $mla_arguments, $blacklist );
+
+				// Allow for changed parameter names
+				if ( isset( $attr[ $mla_archive_parameter ] ) ) {
+					$blacklist[ $mla_archive_parameter] = $attr[ $mla_archive_parameter ];
+				}
+
+				if ( isset( $attr[ $mla_page_parameter ] ) ) {
+					$blacklist[ $mla_page_parameter] = $attr[ $mla_page_parameter ];
+				}
 			}
 
 			// Suppress mla_alt... shortcode arguments in second mla_gallery
@@ -1254,19 +1358,15 @@ class MLAShortcode_Support {
 			}
 
 			$blacklist = apply_filters( 'mla_gallery_alt_shortcode_blacklist', $blacklist );
-//error_log( __LINE__ . " blacklist = " . var_export( $blacklist, true ), 0 );
 			$alt_attr = apply_filters( 'mla_gallery_alt_shortcode_attributes', $attr );
-//error_log( __LINE__ . " alt_attr = " . var_export( $alt_attr, true ), 0 );
 
 			// Allow for overide of blacklist values, e.g., post_mime_type
 			$alt_parameters = array();
 			if ( !empty( $alt_attr['mla_alt_parameters'] ) ) {
 				$alt_parameters = self::mla_validate_attributes( $alt_attr['mla_alt_parameters'] );
-//error_log( __LINE__ . " alt_parameters = " . var_export( $alt_parameters, true ), 0 );
 				unset( $alt_attr['mla_alt_parameters'] );
 				$alt_attr = array_merge( $alt_attr, $alt_parameters );
 			}
-//error_log( __LINE__ . " alt_attr = " . var_export( $alt_attr, true ), 0 );
 
 			$mla_alt_shortcode_args = array();
 			foreach ( $alt_attr as $key => $value ) {
@@ -1286,7 +1386,6 @@ class MLAShortcode_Support {
 
 			// Restore original delimiters
 			$mla_alt_shortcode_args = str_replace( '[+', '{+', str_replace( '+]', '+}', $mla_alt_shortcode_args ) );
-//error_log( __LINE__ . " mla_alt_shortcode_args = " . var_export( $mla_alt_shortcode_args, true ), 0 );
 
 			/*
 			 * If an alternate value has been specified we must delay alt shortcode execution
@@ -2776,7 +2875,7 @@ class MLAShortcode_Support {
 		 */
 		if ( ! isset( $arguments[ $mla_page_parameter ] ) ) {
 			if ( isset( $attr[ $mla_page_parameter ] ) ) {
-				$arguments[ $mla_page_parameter ] = $attr[ $mla_page_parameter ];
+				$arguments[ $mla_page_parameter ] = absint( $attr[ $mla_page_parameter ] );
 			} else {
 				$arguments[ $mla_page_parameter ] = '';
 			}
@@ -3690,7 +3789,7 @@ class MLAShortcode_Support {
 		 */
 		if ( ! isset( $arguments[ $mla_page_parameter ] ) ) {
 			if ( isset( $attr[ $mla_page_parameter ] ) ) {
-				$arguments[ $mla_page_parameter ] = $attr[ $mla_page_parameter ];
+				$arguments[ $mla_page_parameter ] = absint( $attr[ $mla_page_parameter ] );
 			} else {
 				$arguments[ $mla_page_parameter ] = NULL;
 			}
@@ -3925,22 +4024,8 @@ class MLAShortcode_Support {
 			self::$mla_get_shortcode_dynamic_attachments_parameters['tax_include_children'] = $attr['tax_include_children'];
 		}
 
-		// Convert lists to arrays, if they have more than one element
-		if ( isset( $arguments['post_type'] ) && is_string( $arguments['post_type'] ) ) {
-			$value = explode( ',', $arguments['post_type'] );
-			if ( 1 < count( $value ) ) {
-				$arguments['post_type'] = $value;
-			}
-		}
-
-		if ( isset( $arguments['post_status'] ) && is_string( $arguments['post_status'] ) ) {
-			$arguments['post_status'] = explode( ',', $arguments['post_status'] );
-			foreach ( $arguments['post_status'] as $key => $value ) {
-				if( in_array( $value, array( 'draft', 'future', 'pending', 'private', 'trash' ) ) ) {
-					unset( $arguments['post_status'][ $key ] );
-				}
-			}
-		}
+		$arguments['post_type'] = ( isset( $arguments['post_type'] )  ? self::mla_validate_post_types( $arguments['post_type'] ) : array( 'attachment' ));
+		$arguments['post_status'] = ( isset( $arguments['post_status'] ) ? self::mla_validate_post_stati( $arguments['post_status'] ) : array( 'inherit' ));
 
 		// Convert simple date parameters to a date query when meta_date_key is present
 		$simple_date_query = array();

@@ -1956,7 +1956,7 @@ class MLA_IPTC_EXIF_List_Table extends WP_List_Table {
 			$base_url = 'options-general.php?page=' . MLACoreOptions::MLA_SETTINGS_SLUG . '-iptc_exif&mla_tab=iptc_exif';
 
 			if ( isset( $_REQUEST['s'] ) ) {
-				$base_url = add_query_arg( array( 's' => wp_kses( wp_unslash( $_REQUEST['s'] ), 'post' ) ), $base_url );
+				$base_url = add_query_arg( array( 's' => urlencode( wp_kses( wp_unslash( $_REQUEST['s'] ), 'post' ) ) ), $base_url );
 			}
 		}
 
@@ -1980,7 +1980,7 @@ class MLA_IPTC_EXIF_List_Table extends WP_List_Table {
 		$current_view = isset( $_REQUEST['mla_iptc_exif_view'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['mla_iptc_exif_view'] ) ) : 'all';
 
 		// Generate the list of views, retaining keyword search criterion
-		$s = wp_kses( isset( $_REQUEST['s'] ) ? wp_unslash( $_REQUEST['s'] ) : '', 'post' );
+		$s = urlencode( wp_kses( isset( $_REQUEST['s'] ) ? wp_unslash( $_REQUEST['s'] ) : '', 'post' ) );
 		$iptc_exif_items = MLA_IPTC_EXIF_Query::mla_tabulate_iptc_exif_items( $s );
 		$view_links = array();
 		foreach ( $iptc_exif_items as $slug => $item )

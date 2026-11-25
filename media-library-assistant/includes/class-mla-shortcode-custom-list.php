@@ -989,7 +989,7 @@ class MLACustomList {
 		 */
 		if ( ! isset( $attr[ $mla_page_parameter ] ) ) {
 			if ( isset( $_REQUEST[ $mla_page_parameter ] ) ) {
-				$attr[ $mla_page_parameter ] = sanitize_text_field( wp_unslash( $_REQUEST[ $mla_page_parameter ] ) );
+				$attr[ $mla_page_parameter ] = absint( $_REQUEST[ $mla_page_parameter ] );
 			}
 		}
 
@@ -1032,7 +1032,7 @@ class MLACustomList {
 		 */
 		if ( ! isset( $arguments[ $mla_page_parameter ] ) ) {
 			if ( isset( $attr[ $mla_page_parameter ] ) ) {
-				$arguments[ $mla_page_parameter ] = $attr[ $mla_page_parameter ];
+				$arguments[ $mla_page_parameter ] = absint( $attr[ $mla_page_parameter ] );
 			} else {
 				$arguments[ $mla_page_parameter ] = $defaults['mla_page_parameter'];
 			}
@@ -1133,7 +1133,12 @@ class MLACustomList {
 
 		$arguments = apply_filters( 'mla_custom_list_arguments', $arguments );
 
-		self::$mla_debug = ( ! empty( $arguments['mla_debug'] ) ) ? trim( strtolower( $arguments['mla_debug'] ) ) : false;
+		if ( current_user_can( 'edit_posts' ) ) {
+			self::$mla_debug = ( ! empty( $arguments['mla_debug'] ) ) ? trim( strtolower( $arguments['mla_debug'] ) ) : false;
+		} else {
+			self::$mla_debug = false;
+		}
+
 		if ( self::$mla_debug ) {
 			if ( 'true' === self::$mla_debug ) {
 				MLACore::mla_debug_mode( 'buffer' );
@@ -1291,13 +1296,8 @@ class MLACustomList {
 		$mla_multi_select = ( ! empty( $arguments['mla_multi_select'] ) ) && ( 'true' === trim( strtolower( $arguments['mla_multi_select'] ) ) );
 
 		// Convert lists to arrays
-		if ( is_string( $arguments['post_type'] ) ) {
-			$arguments['post_type'] = explode( ',', $arguments['post_type'] );
-		}
-
-		if ( is_string( $arguments['post_status'] ) ) {
-			$arguments['post_status'] = explode( ',', $arguments['post_status'] );
-		}
+		$arguments['post_type'] = ( isset( $arguments['post_type'] )  ? MLAShortcode_Support::mla_validate_post_types( $arguments['post_type'] ) : array( 'attachment' ));
+		$arguments['post_status'] = ( isset( $arguments['post_status'] ) ? MLAShortcode_Support::mla_validate_post_stati( $arguments['post_status'] ) : array( 'inherit' ));
 
 		if ( $is_pagination && ( NULL !== $arguments['mla_paginate_rows'] ) ) {
 			$values = array( 'found_rows' => absint( $arguments['mla_paginate_rows'] ) );

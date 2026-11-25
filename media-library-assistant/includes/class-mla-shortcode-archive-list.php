@@ -1029,7 +1029,7 @@ class MLAArchiveList {
 				$item_values['item_link_text'] = esc_attr( MLAShortcode_Support::mla_process_shortcode_parameter( $item_values['mla_link_text'], $item_values ) );
 			}
 
-			if ( ! empty( $item_values['show_count'] ) && ( 'true' === strtolower( $item_values['show_count'] ) ) ) {
+			if ( ! empty( $item_values['show_count'] ) && ( true === $item_values['show_count'] ) ) {
 				// Ignore option-all
 				if ( -1 !== $item_values['items'] ) {
 					$item_values['item_label'] .= ' (' . $item_values['items'] . ')';
@@ -1341,7 +1341,12 @@ class MLAArchiveList {
 		$raw_attr = $attr;
 		$attr = MLAShortcodes::mla_validate_attributes( $attr, $content );
 
-		self::$mla_debug = ( ! empty( $attr['mla_debug'] ) ) ? trim( strtolower( $attr['mla_debug'] ) ) : false;
+		if ( current_user_can( 'edit_posts' ) ) {
+			self::$mla_debug = ( ! empty( $attr['mla_debug'] ) ) ? trim( strtolower( $attr['mla_debug'] ) ) : false;
+		} else {
+			self::$mla_debug = false;
+		}
+
 		if ( self::$mla_debug ) {
 			if ( 'true' === self::$mla_debug ) {
 				MLACore::mla_debug_mode( 'buffer' );
@@ -1495,7 +1500,7 @@ class MLAArchiveList {
 		 */
 		if ( ! isset( $attr[ $mla_page_parameter ] ) ) {
 			if ( isset( $_REQUEST[ $mla_page_parameter ] ) ) {
-				$attr[ $mla_page_parameter ] = sanitize_text_field( wp_unslash( $_REQUEST[ $mla_page_parameter ] ) );
+				$attr[ $mla_page_parameter ] = absint( $_REQUEST[ $mla_page_parameter ] );
 			}
 		}
 
@@ -1563,7 +1568,7 @@ class MLAArchiveList {
 		 */
 		if ( ! isset( $arguments[ $mla_page_parameter ] ) ) {
 			if ( isset( $attr[ $mla_page_parameter ] ) ) {
-				$arguments[ $mla_page_parameter ] = $attr[ $mla_page_parameter ];
+				$arguments[ $mla_page_parameter ] = absint( $attr[ $mla_page_parameter ] );
 			} else {
 				$arguments[ $mla_page_parameter ] = $default_arguments['mla_page_parameter'];
 			}
@@ -1759,6 +1764,10 @@ class MLAArchiveList {
 		if ( ! in_array( $arguments['unit'], array( 'pt', 'px', 'em', '%' ) ) ) {
 			$arguments['unit'] = 'pt';
 		}
+
+		// Validate post_type and post_status values for passing to mla_get_shortcode_attachments() and mla_archive_posts_clauses_request()
+		$attr['post_type'] = ( isset( $attr['post_type'] )  ? MLAShortcode_Support::mla_validate_post_types( $attr['post_type'] ) : array( 'attachment' ));
+		$attr['post_status'] = ( isset( $attr['post_status'] ) ? MLAShortcode_Support::mla_validate_post_stati( $attr['post_status'] ) : array( 'inherit' ));
 
 		// mla_debug controls output from this shortcode
 		self::$mla_debug = ( ! empty( $arguments['mla_debug'] ) ) ? trim( strtolower( $arguments['mla_debug'] ) ) : false;

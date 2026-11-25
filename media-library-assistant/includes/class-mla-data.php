@@ -1383,13 +1383,13 @@ class MLAData {
 		if ( is_wp_error( $terms ) ) {
 			$text = implode( ',', $terms->get_error_messages() );
 		} elseif ( ! empty( $terms ) ) {
-			if ( 'single' === $value['option'] || 1 == count( $terms ) ) {
+			if ( 'single' === $value['option'] || 1 === count( $terms ) ) {
 				reset( $terms );
 				$term = current( $terms );
 				$fields = get_object_vars( $term );
 				$text = isset( $fields[ $field ] ) ? $fields[ $field ] : $fields['name'];
 				$text = sanitize_term_field( $field, $text, $term->term_id, $taxonomy, 'display' );
-			} elseif ( ( 'export' === $value['option'] ) || ( 'unpack' == $value['option'] ) ) {
+			} elseif ( ( 'export' === $value['option'] ) || ( 'unpack' === $value['option'] ) ) {
 				$text = sanitize_text_field( var_export( $terms, true ) );
 			} else {
 				foreach ( $terms as $term ) {
@@ -1416,9 +1416,15 @@ class MLAData {
 	 * @return	string	Text representation of custom field value
 	 */
 	public static function _expand_custom_field( $value, $post_id ) {
+		if ( is_protected_meta( $value['value'], 'post' ) ) {
+			if ( ! current_user_can( 'edit_post', $post_id ) ) {
+				return '';
+			}
+		}
+
 		if ( 0 < $post_id ) {
-			$record = get_metadata( 'post', $post_id, $value['value'], 'single' == $value['option'] );
-			if ( empty( $record ) && 'ALL_CUSTOM' == $value['value'] ) {
+			$record = get_metadata( 'post', $post_id, $value['value'], 'single' === $value['option'] );
+			if ( empty( $record ) && 'ALL_CUSTOM' === $value['value'] ) {
 				$meta_values = MLAQuery::mla_fetch_attachment_metadata( $post_id );
 				$clean_data = array();
 				foreach( $meta_values as $meta_key => $meta_value ) {
@@ -1427,6 +1433,12 @@ class MLAData {
 					}
 
 					$meta_key = substr( $meta_key, 9 );
+					if ( is_protected_meta( $meta_key, 'post' ) ) {
+						if ( ! current_user_can( 'edit_post', $post_id ) ) {
+							continue;
+						}
+					}
+
 					if ( is_array( $meta_value ) ) {
 						$clean_data[ $meta_key ] = '(ARRAY)';
 					} elseif ( is_string( $meta_value ) ) {
@@ -1631,13 +1643,6 @@ class MLAData {
 
 					break;
 				case 'parent_custom':
-					$parent_id = isset( $markup_values[ 'parent' ] ) ? (int) $markup_values[ 'parent' ] : 0;
-					
-					if ( 0 < $parent_id ) {
-						$markup_values[ $markup_key ] = self::_expand_custom_field( $value, $parent_id );
-					}
-
-					break;
 				case 'parent':
 					if ( isset( $markup_values['parent'] ) ) {
 						$parent_id = absint( $markup_values['parent'] );
@@ -1645,17 +1650,29 @@ class MLAData {
 						$item = get_post( $post_id );
 						$parent_id = absint( $item->post_parent );
 					}
-		
+
 					if ( 0 === $parent_id ) {
 						$markup_values[ $markup_key ] = '';
 						break;
 					}
-		
+
+					if ( post_password_required( $parent_id ) ) {
+						$markup_values[ $markup_key ] = '';
+						break;
+					}
+
 					if ( 'post_password' === $value['value'] ) {
 						$markup_values[ $markup_key ] = '';
 						break;
 					}
-		
+
+					if ( is_protected_meta( $value['value'], 'post' ) ) {
+						if ( ! current_user_can( 'edit_post', $parent_id ) ) {
+							$markup_values[ $markup_key ] = '';
+							break;
+						}
+					}
+
 					if ( isset( $parent_cache[ $parent_id ] ) ) {
 						$parent = $parent_cache[ $parent_id ];
 					} else {
@@ -1667,6 +1684,18 @@ class MLAData {
 							$markup_values[ $markup_key ] = '';
 							break;
 						}
+					}
+
+					if( in_array( $parent->post_status, array( 'draft', 'future', 'pending', 'private', 'trash' ) ) ) {
+						if ( ! current_user_can( 'read_post', $parent_id ) ) {
+							$markup_values[ $markup_key ] = '';
+							break;
+						}
+					}
+
+					if ( 'parent_custom' === $value['prefix'] ) {
+						$markup_values[ $markup_key ] = self::_expand_custom_field( $value, $parent_id );
+						break;
 					}
 
 					$parent_value = '';

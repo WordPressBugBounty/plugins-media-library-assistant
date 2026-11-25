@@ -975,8 +975,8 @@ class MLAQuery {
 					break;
 				// ['mla_filter_term'] - filter by taxonomy term ID (-1 allowed), or by custom field
 				case 'mla_filter_term':
-					if ( MLACoreOptions::MLA_FILTER_METAKEY == MLACore::mla_taxonomy_support('', 'filter') ) {
-						if ( MLACoreOptions::ALL_MLA_FILTER_METAKEY != $value ) {
+					if ( MLACoreOptions::MLA_FILTER_METAKEY === MLACore::mla_taxonomy_support('', 'filter') ) {
+						if ( MLACoreOptions::ALL_MLA_FILTER_METAKEY !== $value ) {
 							$clean_request['mla-metakey'] = MLACore::mla_taxonomy_support('', 'metakey');
 							$clean_request['mla-metavalue'] = stripslashes( $value );
 						}
@@ -997,7 +997,7 @@ class MLAQuery {
 					}
 					break;
 				case 'detached':
-					if ( ( '0' == $value ) || ( '1' == $value ) ) {
+					if ( ( '0' === $value ) || ( '1' === $value ) ) {
 						$clean_request['detached'] = $value;
 					}
 
@@ -1009,7 +1009,7 @@ class MLAQuery {
 
 					break;
 				case 'status':
-					if ( 'trash' == $value ) {
+					if ( 'trash' === $value ) {
 						$clean_request['post_status'] = 'trash';
 					}
 
@@ -1127,8 +1127,6 @@ class MLAQuery {
 
 					break;
 				case 'tax_query':
-//				case 'meta_query': // not allowed externally
-//				case 'shortcode_query': // not allowed externally
 					if ( ! empty( $value ) ) {
 						if ( is_array( $value ) ) {
 							$clean_request[ $key ] = $value;

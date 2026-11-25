@@ -2,8 +2,8 @@
 Contributors: dglingren
 Donate link: http://davidlingren.com/#donate
 Tags: categories, images, media, media library, tags
-Tested up to: 7.1.4
-Stable tag: 3.44
+Tested up to: 7.2
+Stable tag: 3.45
 Requires at least: 5.3.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -198,6 +198,17 @@ Please report security bugs found in the source code of the Media LIbrary Assist
 21. The Settings page Debug tab, where you can activate debug logging categories as well as manage and display the error log.
 
 == Changelog ==
+
+= 3.45 =
+* Fix: IMPORTANT: A Cross-Site Scripting vulnerability (Patchstack 40509) has been mitigated.
+* Fix: IMPORTANT: A Broken Access Control vulnerability (Patchstack 40500) has been mitigated.
+* Fix: IMPORTANT: A Content Injection vulnerability (Patchstack 38229) has been mitigated.
+* Fix: IMPORTANT: A Sensitive Data Exposure vulnerability (WPScan Security #56355, credit Jacek Sowinski) mitigation has been improved.
+* Fix: IMPORTANT: A Broken Access Control vulnerability (Patchstack 38033) has been mitigated.
+* Fix: IMPORTANT: For the Smart Media Categories example plugin, an SQL Injection vulnerability (Patchstack 40678) has been mitigated.
+* Fix: For the MMMW popup window, attachments browser content after adding an item on the "Upload files" tab has been corrected.
+* Fix: For the Media Library Grid mode and MMMW popup window toolbar, handling of the "all" and "no" term filter options has been corrected.
+* Fix: Relative positioning of the Extension icons on the Settings/Media Library Assistant Uploads tab has been restored.
 
 = 3.44 =
 * Fix: IMPORTANT: A Sensitive Data Exposure vulnerability (WPScan Security #56355, credit Jacek Sowinski) has been mitigated.
@@ -431,8 +442,8 @@ Please report security bugs found in the source code of the Media LIbrary Assist
 
 == Upgrade Notice ==
 
-= 3.44 =
-IMPORTANT: Six security vulnerabilities (Patchstack 37177, 37374 and WPScan Security 47593, 47595, 47596, 56355) have been mitigated. Example plugin PHP fixes, shortcode parameter parsing and ajaxurl handling fixes. Nine fixes in all.
+= 3.45 =
+IMPORTANT: Six security vulnerabilities (Patchstack 38033, 38229, 40500, 40509, 40678 and WPScan Security 56355) have been mitigated. Some MMMW popup window fixes. Nine fixes in all.
 
 == Acknowledgements ==
 

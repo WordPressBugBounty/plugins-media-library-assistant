@@ -417,6 +417,10 @@ p.submit.mla-settings-submit {
 	padding-bottom: 0px
 }
 
+table.upload_types th.column-primary div.upload_types-icon {
+	position: relative;
+}
+
 #mla-shortcode-list  {
 	width: 90%;
 	padding-left: 5%;

@@ -38,6 +38,18 @@ class SMC_Settings_Support {
 	 * @return	void
 	 */
 	public static function initialize() {
+		static $hook_needed = true;
+		
+		// WordPress can't call _load_textdomain_just_in_time() before the init action
+		if ( ! did_action( 'init' ) ) {
+			if ( $hook_needed ) {
+				add_action( 'init', 'SMC_Settings_Support::initialize', 10 );
+				$hook_needed = false;
+			}
+			
+			return;
+		}
+
 		SMC_Settings_Support::$option_definitions = array(
 			'smc_automatic_options' => array(
 				'post_types' => array(

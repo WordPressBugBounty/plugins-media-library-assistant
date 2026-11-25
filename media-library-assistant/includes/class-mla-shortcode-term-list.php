@@ -687,7 +687,12 @@ class MLATermList {
 			$arguments['hierarchical'] = 'false';
 		}
 
-		self::$mla_debug = ( ! empty( $arguments['mla_debug'] ) ) ? trim( strtolower( $arguments['mla_debug'] ) ) : false;
+		if ( current_user_can( 'edit_posts' ) ) {
+			self::$mla_debug = ( ! empty( $arguments['mla_debug'] ) ) ? trim( strtolower( $arguments['mla_debug'] ) ) : false;
+		} else {
+			self::$mla_debug = false;
+		}
+
 		if ( self::$mla_debug ) {
 			if ( 'true' === self::$mla_debug ) {
 				MLACore::mla_debug_mode( 'buffer' );
@@ -817,13 +822,8 @@ class MLATermList {
 			$arguments['taxonomy'] = explode( ',', $arguments['taxonomy'] );
 		}
 
-		if ( is_string( $arguments['post_type'] ) ) {
-			$arguments['post_type'] = explode( ',', $arguments['post_type'] );
-		}
-
-		if ( is_string( $arguments['post_status'] ) ) {
-			$arguments['post_status'] = explode( ',', $arguments['post_status'] );
-		}
+		$arguments['post_type'] = ( isset( $arguments['post_type'] )  ? MLAShortcode_Support::mla_validate_post_types( $arguments['post_type'] ) : array( 'attachment' ));
+		$arguments['post_status'] = ( isset( $arguments['post_status'] ) ? MLAShortcode_Support::mla_validate_post_stati( $arguments['post_status'] ) : array( 'inherit' ));
 
 		// Hierarchical exclude is done in _get_term_tree to exclude children
 		if ( $is_hierarchical && isset( $arguments['exclude'] ) ) {

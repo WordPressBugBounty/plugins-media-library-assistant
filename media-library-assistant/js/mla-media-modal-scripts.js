@@ -10,6 +10,7 @@ var wp, wpAjax, ajaxurl, jQuery, _,
 		initialHTML: {},
 		uploading: false,
 		cid: null,
+		addState: '',
 
 		// Utility functions
 		utility: {
@@ -78,10 +79,10 @@ var wp, wpAjax, ajaxurl, jQuery, _,
 	} // */
 
 /*	for debug : trace every invocation of the media.post method * /
-	var originalMediaPost = media.post;
-	media.post = function( action, data ) {
-		//console.log('media.post action: ', action );
-		//console.log('media.post data: ', JSON.stringify( data ) );
+	var originalMediaPost = wp.media.post;
+	wp.media.post = function( action, data ) {
+		console.log('wp.media.post action: ', action );
+		console.log('wp.media.post data: ', JSON.stringify( data ) );
 
 		return originalMediaPost.apply(this, Array.prototype.slice.call(arguments));
 	}; // */
@@ -89,8 +90,8 @@ var wp, wpAjax, ajaxurl, jQuery, _,
 /*	for debug : trace every invocation of the wp.ajax.send function * /
 	var originalWpAjaxSend = wp.ajax.send;
 	wp.ajax.send = function( action, data ) {
-		//console.log('wp.ajax.send action: ', JSON.stringify( action ) );
-		//console.log('wp.ajax.send data: ', JSON.stringify( data ) );
+		console.log('wp.ajax.send action: ', JSON.stringify( action ) );
+		console.log('wp.ajax.send data: ', JSON.stringify( data ) );
 
 		return originalWpAjaxSend.apply(this, Array.prototype.slice.call(arguments));
 	}; // */
@@ -349,6 +350,7 @@ var wp, wpAjax, ajaxurl, jQuery, _,
 						filters[ key ] = {
 							text: text,
 							props: {
+								status:  null,
 								type:    key,
 								uploadedTo: null,
 								orderby: 'date',
@@ -360,9 +362,10 @@ var wp, wpAjax, ajaxurl, jQuery, _,
 				});
 
 				filters.all = {
-					text:  text || l10n.allMediaItems,
+					text:  l10n.allMediaItems,
 					props: {
-						type:    'image',
+						status:  null,
+						type:    null,
 						uploadedTo: null,
 						orderby: 'date',
 						order:   'DESC',
@@ -374,7 +377,8 @@ var wp, wpAjax, ajaxurl, jQuery, _,
 				filters.uploaded = {
 					text:  l10n.uploadedToThisPost,
 					props: {
-						type:    'image',
+						status:  null,
+						type:    null,
 						uploadedTo: wp.media.view.settings.post.id,
 						orderby: 'menuOrder',
 						order:   'ASC',
@@ -386,7 +390,8 @@ var wp, wpAjax, ajaxurl, jQuery, _,
 				filters.unattached = {
 					text:  l10n.unattached,
 					props: {
-						type:    'image',
+						status:  null,
+						type:    null,
 						uploadedTo: 0,
 						orderby: 'menuOrder',
 						order:   'ASC',
@@ -399,7 +404,8 @@ var wp, wpAjax, ajaxurl, jQuery, _,
 					filters.mine = {
 						text:  l10n.mine,
 						props: {
-							type:    'image',
+							status:  null,
+							type:    null,
 							uploadedTo:	null,
 							orderby:	'date',
 							order:		'DESC',
@@ -891,6 +897,26 @@ var wp, wpAjax, ajaxurl, jQuery, _,
 				console.log('toolbarEvent(  ) Event: ', eventName);
 			}, // */
 
+			contentDeactivateUploadEvent: function() {
+				mlaModal.addState = 'content:deactivate:upload'
+			},
+
+			contentActivateBrowseEvent: function() {
+				if ( mlaModal.addState === 'content:deactivate:upload' ) {
+					mlaModal.addState = 'content:activate:browse';
+				} else {
+					mlaModal.addState = '';
+				}
+			},
+
+			libraryAddEvent: function() {
+				if ( mlaModal.addState === 'content:activate:browse' ) {
+					mlaModal.addState = 'library:selection:add';
+				} else {
+					mlaModal.addState = '';
+				}
+			},
+
 			initialize: function() {
 				mlaAttachmentsBrowser.prototype.initialize.apply( this, arguments );
 
@@ -983,6 +1009,14 @@ this.controller.off( null, this.toolbarEvent );
 this.controller.on( 'all', this.toolbarEvent );
 console.log( 'listening to controller events' );
 // */
+
+				// Detect when a new attachment is added to the library from the Uploads tab
+				this.controller.off( 'content:deactivate:upload', this.contentDeactivateUploadEvent );
+				this.controller.on( 'content:deactivate:upload', this.contentDeactivateUploadEvent );
+				this.controller.off( 'content:activate:browse', this.contentActivateBrowseEvent );
+				this.controller.on( 'content:activate:browse', this.contentActivateBrowseEvent );
+				this.controller.off( 'library:selection:add', this.libraryAddEvent );
+				this.controller.on( 'library:selection:add', this.libraryAddEvent );
 
 				// Suppress the "Filter Media" heading
 				$( '.media-attachments-filter-heading', this.$el ).css( 'display', 'none' );
@@ -1499,23 +1533,10 @@ console.log( 'listening to controller events' );
 	 */
 	if ( mlaModal.settings.enableDetailsCategory || mlaModal.settings.enableDetailsTag ) {
 		wp.media.view.AttachmentCompat = wp.media.view.AttachmentCompat.extend({
-			/* Removed in MLA 2.99 to resolve "how to fix some att. categories bugs with ACF field" * /
-			initialize: function() {
-				// Call the base method in the super class
-				//wp.media.view.AttachmentCompat.__super__.initialize.apply( this, arguments );
-				mlaAttachmentCompat.prototype.initialize.apply( this, arguments );
-
-				// Hook the 'ready' event when the sidebar has been rendered so we can add our enhancements
-				this.on( 'ready', function() {
-					mlaModal.utility.hookCompatTaxonomies( this.model.get('id'), this.el );
-				});
-			}, // */
-			
 			render: function() {
 				// Call the base method in the super class
 				//wp.media.view.AttachmentCompat.__super__.initialize.apply( this, arguments );
 				mlaAttachmentCompat.prototype.render.apply( this, arguments );
-
 				mlaModal.utility.hookCompatTaxonomies( this.model.get('id'), this.el );
 				return this;
 			}
@@ -1586,6 +1607,11 @@ this.listenTo( this, 'all', this.selectionEvent );
 					if ( mlaModal.uploading && mlaModal.cid === model.cid ) {
 						mlaModal.uploading = false;
 						hookCompat = true;
+
+						if ( mlaModal.addState === 'library:selection:add' ) {
+							$( '#mla-search-submit', mlaModal.settings.$el ).trigger('click');
+							mlaModal.addState = '';
+						}
 					} else {
 						// ignore changes during upload
 						if ( false === model.attributes.uploading ) {
@@ -1616,6 +1642,10 @@ this.listenTo( this, 'all', this.selectionEvent );
 	mlaModal.utility.hookCompatTaxonomies = function( attachmentId, context ) {
 		var prefix, taxonomy, clickTaxonomy = null;
 		
+		if ( 'undefined' === typeof attachmentId ) {
+			return;
+		}
+
 		mlaModal.settings.prefix++,
 		prefix = mlaModal.settings.prefix.toString();
 
@@ -1629,7 +1659,6 @@ this.listenTo( this, 'all', this.selectionEvent );
 			}
 		} // */
 
-		//console.log( 'hook prefix: ' + prefix + ' attachmentId: ' + attachmentId );
 		$('.mla-taxonomy-field .categorydiv', context ).each( function(){
 			taxonomy = mlaModal.utility.parseTaxonomyId( $(this).attr('id') );
 
@@ -1799,10 +1828,6 @@ this.listenTo( this, 'all', this.selectionEvent );
 				$( '.compat-field-' + taxonomy + ' span', context ).on( 'click', function() {
 					$(this).parents( 'th' ).siblings( 'td' ).slideToggle();
 				});
-
-//				$( '.compat-field-' + taxonomy + ' th', context ).on( 'click', function() {
-//					$(this).siblings( 'td' ).slideToggle();
-//				});
 
 				// Update the taxonomy terms, if changed, on the server when the mouse leaves the checklist area
 				thisJQuery.on( "mouseleave", function( e ) {

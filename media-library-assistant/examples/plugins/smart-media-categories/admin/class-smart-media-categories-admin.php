@@ -37,6 +37,24 @@ class Smart_Media_Categories_Admin {
 	protected static $instance = NULL;
 
 	/**
+	 * Unique identifier for the plugin.
+	 *
+	 * @since    1.1.10
+	 *
+	 * @var      string
+	 */
+	protected $plugin_slug = 'smart-media-categories';
+
+	/**
+	 * Unique JavaScript object name for the plugin.
+	 *
+	 * @since    1.1.10
+	 *
+	 * @var      string
+	 */
+	protected $plugin_object = 'smart_media_categories';
+
+	/**
 	 * Slug of the plugin screen.
 	 *
 	 * @since    1.0.0
@@ -53,6 +71,34 @@ class Smart_Media_Categories_Admin {
 	 * @var      string
 	 */
 	protected $current_edit_type = NULL;
+
+	/**
+	 * Validate the post_type parameter
+	 *
+	 * @since 1.1.10
+	 *
+	 * @param	string	$post_type Post type value to be validated
+	 * @param	string	$default Optional. Default post type value, if not provided, 'post'
+	 *
+	 * @return	string	validated post type value
+	 */
+	private static function _validate_post_type( $post_type, $default = 'post' ) {
+	if ( current_user_can( 'manage_options' ) ) {
+			$registered_post_types = get_post_types( array(), 'names' );
+		} else {
+			$registered_post_types = get_post_types( array( 'public' => true ), 'names' );
+		}
+
+		$post_type = strtolower( trim( $post_type ) );
+
+		if ( in_array( $post_type, $registered_post_types ) ) {
+			$valid_post_type = $post_type;
+		} else {
+			$valid_post_type = strtolower( trim( $default ) );
+		}
+
+		return $valid_post_type;
+	}
 
 	/**
 	 * Initialize the plugin by loading admin scripts & styles and adding a
@@ -93,10 +139,10 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 } // */
 
 		// Determine Post Type, if possible
-		if ( isset( $_REQUEST['post_type'] ) ) {		
-			$this->current_edit_type = trim( wp_kses( wp_unslash( $_REQUEST['post_type'] ), 'post' ) );
+		if ( isset( $_REQUEST['post_type'] ) ) {
+			$this->current_edit_type = self::_validate_post_type( wp_kses( wp_unslash( $_REQUEST['post_type'] ), 'post' ) );
 		}
-		
+
 		// Handle Ajax requests
 		if ( defined('DOING_AJAX') && DOING_AJAX ) {
 			add_action( 'wp_ajax_' . 'smc_find_posts', array( $this, 'action_wp_ajax_smc_find_posts' ) );
@@ -105,22 +151,25 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 				add_filter( "manage_posts_columns", array( $this, 'filter_manage_posts_columns' ), 10, 1 );
 				add_action( "manage_posts_custom_column", array( $this, 'action_manage_posts_custom_column' ), 10, 2 );
 			}
-			
+
 			return;
 		} // DOING_AJAX
-		
+
 		// Process SMC-specific actions
 		if ( isset( $_REQUEST['action'] ) ) {
 			if ( in_array( $_REQUEST['action'], array( 'smc_posts_modal', 'smc_pages_modal' ) ) ) {
+				check_ajax_referer( 'smc_find_posts', 'smc-posts-modal-ajax-nonce', false );
 				$action = 'action_' . $_REQUEST['action'];
-				add_action( 'admin_init', array( $this, $action ) ); 
+				add_action( 'admin_init', array( $this, $action ) );
 			} elseif ( isset( $_REQUEST['sync_all_bulk'] ) ) {
-				add_action( 'admin_init', array( $this, 'action_sync_all_bulk' ) ); 
+				check_admin_referer( 'bulk-posts' );
+				add_action( 'admin_init', array( $this, 'action_sync_all_bulk' ) );
 			} elseif ( isset( $_REQUEST['sync_all_filter'] ) ) {
-				add_action( 'admin_init', array( $this, 'action_sync_all_filter' ) ); 
+				check_admin_referer( 'bulk-posts' );
+				add_action( 'admin_init', array( $this, 'action_sync_all_filter' ) );
 			}
 		}
-		
+
 		// Intercept Posts/All Posts and Pages/All Pages submenus
 		add_action( "load-edit.php", array( $this, 'action_load_edit_php' ) );
 	}
@@ -161,7 +210,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		}
 
 		$screen = get_current_screen();
-		
+
 		/*
 		 * The All Posts/All Pages modal windows share styles at this time, but
 		 * provide for different styles in the future.
@@ -170,7 +219,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		if ( 0 === strpos( $screen->id, 'edit-' ) ) {
 			$is_smc_type = SMC_Settings_Support::is_smc_post_type( substr( $screen->id, 5 ) );
 		}
-		
+
 		if ( $is_smc_type ) {
 			// All Posts
 			wp_enqueue_style( $this->plugin_slug .'-posts-pages-styles', plugins_url( 'assets/css/smc-posts-pages.css', __FILE__ ), array(), Smart_Media_Categories::VERSION );
@@ -209,7 +258,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		if ( 0 === strpos( $screen->id, 'edit-' ) ) {
 			$is_smc_type = SMC_Settings_Support::is_smc_post_type( substr( $screen->id, 5 ) );
 		}
-		
+
 		if ( $is_smc_type ) {
 			/*
 			 * Posts/All Posts submenu
@@ -227,7 +276,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			);
 
 			wp_localize_script( $this->plugin_slug . 'find-posts-script', $this->plugin_object . '_posts_settings', $script_variables );
-			
+
 			wp_enqueue_script( $this->plugin_slug . 'sync-posts-script', plugins_url( "assets/js/smc-sync-posts{$suffix}.js", __FILE__ ), array( 'suggest', 'jquery', $this->plugin_slug . 'find-posts-script' ), Smart_Media_Categories::VERSION );
 
 			/*
@@ -250,7 +299,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			);
 
 			wp_localize_script( $this->plugin_slug . 'find-posts-script', $this->plugin_object . '_posts_settings', $script_variables );
-			
+
 			/*
 			 * Add the "Select Parent" popup window
 			 */
@@ -293,12 +342,12 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		if ( isset( $_REQUEST['action'] ) && 'update' === $_REQUEST['action'] ) {
 			$active_tab =  SMC_Settings_Support::get_active_tab();
 			$options = isset( $_REQUEST[ $active_tab ] ) ? $_REQUEST[ $active_tab ] : array();
-			
+
 			if ( 'smc_automatic_options' == $active_tab ) {
 				SMC_Settings_Support::validate_automatic_options( $options );
 			}
 		}
-		
+
 		include_once( 'views/smc-admin.php' );
 	}
 
@@ -358,14 +407,14 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 
 			// Add the Smart Media rollover action to the Posts/All Posts items
 			add_filter( "post_row_actions", array( $this, 'filter_post_row_actions' ), 10, 2 );
-			
+
 			// Add the "Children" column to the Posts/All Posts and Pages/All Pages submenus
 			add_filter( "manage_posts_columns", array( $this, 'filter_manage_posts_columns' ), 10, 1 );
 			add_action( "manage_posts_custom_column", array( $this, 'action_manage_posts_custom_column' ), 10, 2 );
-			
+
 			// Add support for filtering on Sync/Unsync status
 			add_filter( 'posts_clauses', array( $this, 'filter_posts_clauses' ), 10, 2 );
-			
+
 			if ( isset( $_REQUEST['smc_message'] ) ) {
 				add_filter( 'bulk_post_updated_messages', array( $this, 'filter_bulk_post_updated_messages' ), 10, 2 );
 			}
@@ -392,11 +441,11 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			if ( empty( $posts ) ) {
 				$posts = '0';
 			}
-			
+
 			$clauses['where'] = " AND {$wpdb->posts}.ID IN ( " . $posts . ' )' . $clauses['where'];
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::filter_posts_clauses updated $clauses[where] = ' . var_export( $clauses['where'], true ), 0 );
 		}
-		
+
 		return $clauses;
 	}
 
@@ -414,7 +463,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		if (  SMC_Settings_Support::is_smc_post_type( $post->post_type ) ) {
 			$actions['smart hide-if-no-js'] = sprintf( '<a href="#" onclick="smc.syncPosts.open( \'%1$s\' ); return false;" title="Sync terms">Smart&nbsp;Media</a>', $post->ID );
 		}
-		
+
 		return $actions;
 	}
 
@@ -436,7 +485,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 	 * Compose <div> tags for term assignments
 	 *
 	 * @since 1.0.0
-	 * 
+	 *
 	 * @param	integer	ID of the parent object
 	 * @param	object	taxonomy object
 	 * @param	array	object => term id and slug assignments
@@ -445,26 +494,26 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 	 */
 	private function _build_term_assignments( $post_id, &$tax_object, &$term_assignments ) {
 		$tax_name = $tax_object->name;
-		
+
 		if ( isset( $term_assignments[ $post_id ][ $tax_name ] ) ) {
 			$terms = $term_assignments[ $post_id ][ $tax_name ];
 		} else {
 			$terms = array();
 		}
-	
+
 		$ids = array();
 		if ( $tax_object->hierarchical ) {
 			foreach( $terms as $term ) {
 				$ids[] = $term['id'];
 			}
-	
+
 			return '	<div class="smc-categories" id="' . $tax_name . '-' . $post_id . '">'
 				. implode( ',', $ids ) . "</div>\n";
 		} else {
 			foreach( $terms as $term ) {
 				$ids[] = $term['slug'];
 			}
-	
+
 			return '	<div class="smc-tags" id="' . $tax_name. '-' .$post_id . '">'
 				. esc_attr( implode( ', ', $ids ) ) . "</div>\n";
 		}
@@ -474,7 +523,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 	 * Add hidden fields with the data for use in the "Smart Media Categories" popup
 	 *
 	 * @since 1.0.0
-	 * 
+	 *
 	 * @param	object	The parent object
 	 * @param	array	IDs of the children
 	 * @param	array	object => term id and slug assignments
@@ -502,9 +551,9 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 	 *
 	 * @since 1.0.2
 	 *
-	 * @param	string	View slug 
-	 * @param	string	Slug for current view 
-	 * 
+	 * @param	string	View slug
+	 * @param	string	Slug for current view
+	 *
 	 * @return	string | false	HTML for link to display the view, false if count = zero
 	 */
 	function _get_view( $view_slug, $current_view ) {
@@ -543,7 +592,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			$query = array( 'smc_status' => $view_slug );
 			$base_url = "edit.php?post_type={$this->current_edit_type}";
 			$class = ( $view_slug == $current_view ) ? ' class="current"' : '';
-			
+
 			return "<a href='" . add_query_arg( $query, $base_url ) . "'$class>" . sprintf( translate_nooped_plural( $nooped_plural, $post_count, 'smart-media-categories' ), number_format_i18n( $post_count ) ) . '</a>';
 		}
 
@@ -578,7 +627,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		} else {
 			$current_view = '';
 		}
-		
+
 		foreach ( $views as $slug => $view ) {
 			// Find/update the current view
 			if ( strpos( $view, ' class="current"' ) ) {
@@ -592,19 +641,19 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			}
 		} // each view
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::filter_views_edit_post $current_view = ' . var_export( $current_view, true ), 0 );
-		
+
 		if ( SMC_Settings_Support::is_smc_post_type( $this->current_edit_type ) ) {
 			$value = $this->_get_view( 'sync', $current_view );
 			if ( $value ) {
 				$views['sync'] = $value;
 			}
-			
+
 			$value = $this->_get_view( 'unsync', $current_view );
 			if ( $value ) {
 				$views['unsync'] = $value;
 			}
 		}
-		
+
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::filter_views_edit_post updated $views = ' . var_export( $views, true ), 0 );
 		return $views;
 	}
@@ -627,7 +676,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_manage_posts_custom_column wp = ' . var_export( $wp, true ), 0 );
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_manage_posts_custom_column wp_query = ' . var_export( $wp_query, true ), 0 );
-		
+
 		if ( 'smc_children' != $column_name ) {
 			return;
 		}
@@ -652,11 +701,11 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 				$height = SMC_Settings_Support::get_option( 'scroll_height' );
 				echo "<div style=\"width: 100%; height: {$height}; overflow: auto\">\n";
 			}
-			
+
 			ksort( $children);
 			foreach ($children as $child_id => $child ) {
 				$sync_class = ( $term_assignments[ $child_id ]['smc_sync'] ) ? 'smc-sync-true' : 'smc-sync-false';
-				
+
 				echo sprintf( '<a class="hide-if-no-js %1$s" id="smc-child-%3$s" onclick="smc.findPosts.open( \'%2$s\',\'%3$s\',\'%5$s\' ); return false;" href="%4$s#the-list">%5$s (%3$s)</a><br>', /*%1$s*/ $sync_class, /*%2$s*/ $post_id, /*%3$s*/ $child->ID, /*%4$s*/ admin_url( 'edit.php' ), /*%5$s*/ esc_attr( $child->post_title ) );
 			}
 
@@ -666,7 +715,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		} else {
 			echo __( 'No Children', 'smart-media-categories' );
 		}
-		
+
 		echo $this->_build_inline_data( $post, $children, $term_assignments );
 	}
 
@@ -710,7 +759,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 				$height = SMC_Settings_Support::get_option( 'scroll_height' );
 				echo "<div style=\"width: 100%; height: {$height}; overflow: auto\">\n";
 			}
-			
+
 			ksort( $children);
 			foreach ($children as $child_id => $child ) {
 				$sync_class = 'smc-sync-true';
@@ -744,7 +793,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			} else {
 				$message_type = 'post';
 			}
-			
+
 			$smc_message = explode( ',', trim( wp_kses( wp_unslash( $_REQUEST['smc_message'] ), 'post' ) ) );
 			switch ( $smc_message[0] ) {
 				case '101':
@@ -774,7 +823,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 					break;
 			}
 		}
-	
+
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::filter_bulk_post_updated_messages $messages = ' . var_export( $messages, true ), 0 );
 		return $messages;
 	} // filter_bulk_post_updated_messages
@@ -796,7 +845,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		global $wpdb;
 //error_log( __LINE__ . " Smart_Media_Categories_Admin::_reassign_parent( $old_parent, $new_parent ) \$attachments = " . var_export( $attachments, true ), 0 );
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::_reassign_parent $_REQUEST = ' . var_export( $_REQUEST, true ), 0 );
-		
+
 		if ( !$old_parent ) {
 			wp_die( __( 'Current parent ID not in request.', 'smart-media-categories' ) );
 		}
@@ -814,13 +863,13 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			$attach = array();
 			foreach ( $attachments as $att_id ) {
 				$att_id = (int) $att_id;
-	
+
 				if ( !current_user_can( 'edit_post', $att_id ) )
 					continue;
-	
+
 				$attach[] = $att_id;
 			}
-	
+
 			if ( ! empty( $attach ) ) {
 				foreach ( $attach as $att_id ) {
 					if ( wp_update_post( array( 'ID' => $att_id, 'post_parent' => $new_parent ), true ) ) {
@@ -829,10 +878,10 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 				}
 			}
 		}
-		
+
 		$location = 'edit.php';
 		if ( !empty( $_REQUEST['post_type'] ) ) {
-			$location .= '?post_type=' . esc_url( $_REQUEST['post_type'] );
+			$location .= '?post_type=' . urlencode( $_REQUEST['post_type'] );
 		}
 
 		if ( $referer = wp_get_referer() ) {
@@ -847,7 +896,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		} else {
 			$location = add_query_arg( array( 'updated' => 1, 'smc_message' => '105' ) , $location );
 		}
-		
+
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::_reassign_parent $location = ' . var_export( $location, true ), 0 );
 		wp_redirect( $location );
 		exit();
@@ -862,7 +911,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 	 */
 	public function action_smc_posts_modal() {
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_smc_posts_modal $_POST = ' . var_export( $_POST, true ), 0 );
-		
+
 		if ( isset( $_REQUEST['smc-posts-modal-submit'] ) ) {
 			$this->_reassign_parent( (int) $_REQUEST['parent'], (int) $_REQUEST['found_post_id'], (array) $_REQUEST['children'] );
 		} elseif ( isset( $_REQUEST['smc-sync-update'] ) ) {
@@ -870,7 +919,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			if ( !$parent_id ) {
 				wp_die( __( 'Parent ID not in request.', 'smart-media-categories' ) );
 			}
-	
+
 			//$parent = get_post( $parent_id );
 			if ( !current_user_can( 'edit_post', $parent_id ) ) {
 				wp_die( __( 'You are not allowed to edit this post.', 'smart-media-categories' ) );
@@ -882,7 +931,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			} elseif ( empty( $_REQUEST['children'][0] ) ) {
 				unset( $_REQUEST['children'][0] );
 			}
-			
+
 			extract( SMC_Sync_Support::sync_terms( $parent_id, $_REQUEST['children'], $_REQUEST['tax_input'], $_REQUEST['tax_action'] ) );
 		}
 
@@ -918,7 +967,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 	 */
 	public function action_smc_pages_modal() {
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_smc_pages_modal $_POST = ' . var_export( $_POST, true ), 0 );
-		
+
 		if ( isset( $_REQUEST['smc-posts-modal-submit'] ) ) {
 			$this->_reassign_parent( (int) $_REQUEST['parent'], (int) $_REQUEST['found_post_id'], (array) $_REQUEST['children'] );
 		}
@@ -965,6 +1014,10 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 	 */
 	public function action_sync_all_bulk() {
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_sync_all_bulk $_GET = ' . var_export( $_GET, true ), 0 );
+		if ( !current_user_can( 'edit_posts' ) ) {
+			wp_die( __( 'No terms updated.', 'smart-media-categories' ) );
+		}
+
 		$post_parents = isset( $_REQUEST['post'] ) ? $_REQUEST['post'] : array();
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_sync_all_bulk $post_parents = ' . var_export( $post_parents, true ), 0 );
 
@@ -980,11 +1033,11 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		}
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_sync_all_bulk $parent_count = ' . var_export( $parent_count, true ), 0 );
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_sync_all_bulk $children_count = ' . var_export( $children_count, true ), 0 );
-		
+
 		$view_args = $this->_view_query_args();
 		$view_args['updated'] = 1;
 		$view_args['smc_message'] = '107,' . $parent_count . ',' . $children_count;
-		
+
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_sync_all_bulk URL = ' . var_export( add_query_arg( $view_args, admin_url( 'edit.php' ) ), true ), 0 );
 		wp_redirect( add_query_arg( $view_args, admin_url( 'edit.php' ) ) );
 		exit();
@@ -1001,12 +1054,16 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		global $wp_query;
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_sync_all_filter $_GET = ' . var_export( $_GET, true ), 0 );
 
+		if ( !current_user_can( 'edit_posts' ) ) {
+			wp_die( __( 'No terms updated.', 'smart-media-categories' ) );
+		}
+
 		$assignments = SMC_Sync_Support::get_posts_per_view( array( 'post_type' => $this->current_edit_type, 'smc_status' => 'unsync', 'fields' => 'all' ) );
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_sync_all_filter $assignments = ' . var_export( $assignments, true ), 0 );
 
 		$view_args = $this->_view_query_args();
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_sync_all_filter $view_args = ' . var_export( $view_args, true ), 0 );
-		
+
 		$parent_count = 0;
 		$children_count = 0;
 		$paged_index = 1;
@@ -1028,7 +1085,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 					$unsync_assignments[ $post->ID ] = $assignments[ $post->ID ];
 				}
 			} // each post
-			
+
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_sync_all_filter unsync_assignments = ' . var_export( $unsync_assignments, true ), 0 );
 			if ( ! empty( $unsync_assignments ) ) {
 				$results = SMC_Sync_Support::sync_all( $unsync_assignments );
@@ -1040,7 +1097,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 
 		$view_args['updated'] = 1;
 		$view_args['smc_message'] = '106,' . $parent_count . ',' . $children_count;
-		
+
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_sync_all_filter URL = ' . var_export( add_query_arg( $view_args, admin_url( 'edit.php' ) ), true ), 0 );
 		wp_redirect( add_query_arg( $view_args, admin_url( 'edit.php' ) ) );
 		exit();
@@ -1073,7 +1130,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 
 		$post_types = get_post_types( array( 'public' => true ), 'objects' );
 		unset( $post_types['attachment'] );
-	
+
 		$s = trim( wp_kses( wp_unslash( $_REQUEST['smc_set_parent_search_text'] ), 'post' ) );
 		$count = isset( $_REQUEST['smc_set_parent_count'] ) ? $_REQUEST['smc_set_parent_count'] : self::POSTS_PER_PAGE;
 		$paged = isset( $_REQUEST['smc_set_parent_paged'] ) ? $_REQUEST['smc_set_parent_paged'] : '1';
@@ -1084,21 +1141,21 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			'posts_per_page' => $count,
 			'paged' => $paged,
 		);
-		
+
 		if ( '' !== $s )
 			$args['s'] = $s;
-	
+
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_wp_ajax_smc_find_posts $args = ' . var_export( $args, true ), 0 );
 		$posts = get_posts( $args );
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_wp_ajax_smc_find_posts $posts = ' . var_export( $posts, true ), 0 );
-	
+
 		if ( ( ! $posts ) && $paged > 1 ) {
 			$args['paged'] = $paged = 1;
 			$posts = get_posts( $args );
 		}
 
 		$found = count( $posts );
-		
+
 		$html = '<input name="smc_set_parent_count" id="smc-set-parent-count" type="hidden" value="' . $count . "\">\n";
 		$html .= '<input name="smc_set_parent_paged" id="smc-set-parent-paged" type="hidden" value="' . $paged . "\">\n";
 		$html .= '<input name="smc_set_parent_found" id="smc-set-parent-found" type="hidden" value="' . $found . "\">\n";
@@ -1109,7 +1166,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 			foreach ( $posts as $post ) {
 				$title = trim( $post->post_title ) ? $post->post_title : __( '(no title)' );
 				$alt = ( 'alternate' == $alt ) ? '' : 'alternate';
-		
+
 				switch ( $post->post_status ) {
 					case 'publish' :
 					case 'private' :
@@ -1124,15 +1181,17 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 					case 'draft' :
 						$stat = __('Draft');
 						break;
+					default:
+						$stat = __('Unknown');
 				}
-		
+
 				if ( '0000-00-00 00:00:00' == $post->post_date ) {
 					$time = '';
 				} else {
 					/* translators: date format in table columns, see http://php.net/date */
 					$time = mysql2date(__('Y/m/d'), $post->post_date);
 				}
-		
+
 				$html .= '<tr class="' . trim( 'found-posts ' . $alt ) . '"><td class="found-radio"><input type="radio" id="found-'.$post->ID.'" name="found_post_id" value="' . esc_attr($post->ID) . '"></td>';
 				$html .= '<td><label for="found-'.$post->ID.'">' . esc_html( $title ) . '</label></td><td class="no-break">' . esc_html( $post_types[$post->post_type]->labels->singular_name ) . '</td><td class="no-break">'.esc_html( $time ) . '</td><td class="no-break">' . esc_html( $stat ). ' </td></tr>' . "\n";
 			} // foreach post
@@ -1140,9 +1199,9 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 				$html .= '<tr class="' . trim( 'found-posts ' ) . '"><td class="found-radio">&nbsp;</td>';
 				$html .= '<td colspan="4">No results found.</td></tr>' . "\n";
 		}
-	
+
 		$html .= "</tbody></table>\n";
-	
+
 //error_log( __LINE__ . ' Smart_Media_Categories_Admin::action_wp_ajax_smc_find_posts $html = ' . var_export( $html, true ), 0 );
 		wp_send_json_success( $html );
 	}
@@ -1175,7 +1234,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		$option_template = '                <option %1$s value="%2$s">%3$s</option>' . "\n";
 		$options = sprintf( $option_template, ( 'all' == $selection ) ? 'selected="selected"' : '', 'all', '&mdash; ' . __( 'All Post Types', 'media-library-assistant' ) . ' &mdash;' );
 
-		$post_types = get_post_types( array( 'public' => true ), 'objects' );	
+		$post_types = get_post_types( array( 'public' => true ), 'objects' );
 		unset( $post_types['attachment'] );
 
 		foreach ( $post_types as $key => $value ) {
@@ -1197,7 +1256,7 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 	 */
 	private function _build_smc_popup_form() {
 		$results = array();
-		
+
 		// Build separate arrays of hierarchical and flat taxonomies
 		$taxonomies = get_object_taxonomies( 'attachment', 'objects' );
 		$post_taxonomies = SMC_Settings_Support::smc_taxonomies();
@@ -1225,15 +1284,15 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 				ob_start();
 				wp_terms_checklist( NULL, array( 'taxonomy' => $tax_slug ) );
 				$tax_checklist = ob_get_clean();
-				
+
 				ob_start();
 				include( 'views/smc-sync-tax-options.php' );
 				$taxonomy_options = ob_get_clean();
-				
+
 				ob_start();
 				include( 'views/smc-sync-category-block.php' );
 				$category_block = ob_get_clean();
-				
+
 				$category_blocks .= $category_block;
 			} // current_user_can
 		} // foreach $hierarchical_taxonomies
@@ -1252,11 +1311,11 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 				ob_start();
 				include( 'views/smc-sync-tax-options.php' );
 				$taxonomy_options = ob_get_clean();
-				
+
 				ob_start();
 				include( 'views/smc-sync-tag-block.php' );
 				$tag_block = ob_get_clean();
-				
+
 				$tag_blocks .= $tag_block;
 			} // current_user_can
 		} // foreach $flat_taxonomies
@@ -1264,11 +1323,11 @@ if ( 'heartbeat' != $_REQUEST['action'] ) {
 		ob_start();
 		include( 'views/smc-sync-tag-fieldset.php' );
 		$right_column = ob_get_clean();
-		
+
 		ob_start();
 		include( 'views/smc-sync-div.php' );
 		$results['sync_box'] = ob_get_clean();
-		
+
 		return $results;
 	}
 
